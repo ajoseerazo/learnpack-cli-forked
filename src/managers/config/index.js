@@ -27,6 +27,16 @@ const getExercisesPath = (base) => {
   return possibleFileNames.find(file => fs.existsSync(file)) || null
 }
 
+const getGitpodAddress = () => {
+  if(shell.exec(`gp -h`, { silent: true }).code == 0){
+    return shell.exec(`gp url`, { silent: true }).stdout.replace(/(\r\n|\n|\r)/gm,"");
+  }
+  else{
+    Console.debug(`Gitpod command line tool not found`);
+    return "http://localhost"
+  }
+}
+
 module.exports = async ({ grading, mode, disableGrading, version }) => {
 
     let confPath = getConfigPath()
@@ -64,7 +74,7 @@ module.exports = async ({ grading, mode, disableGrading, version }) => {
     // auto detect agent (if possible)
     if(shell.which('gp')){
       configObj.config.editor.agent = "gitpod";
-      configObj.config.publicUrl = `https://${configObj.config.port}-${configObj.config.address.substring(8)}`
+      configObj.config.publicUrl = getGitpodAddress()
     }else if(!configObj.config.editor.agent){
       configObj.config.editor.agent = "localhost";
       configObj.config.publicUrl = `${config.address}:${config.port}`
