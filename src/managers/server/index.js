@@ -24,12 +24,8 @@ module.exports = async function(configObj, configManager){
         Console.success(`Exercises are running 😃 Open your browser to start practicing!`)
         Console.success(`\n            Open the exercise on this link:`)
 
-        if(shell.which('gp')){
-            Console.log(`            https://${config.port}-${config.address.substring(8)}`)
-        }else{
-            Console.log(`            ${config.address}:${config.port}`)
-            if(config.editor.mode === "standalone") cli.open(`${config.address}:${config.port}`)
-        }
+        Console.log(`            ${config.publicUrl}`)
+        if(config.editor.mode === "standalone") cli.open(`${config.publicUrl}`)
       })
 
     const sockets = new Set();

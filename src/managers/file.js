@@ -30,7 +30,7 @@ const downloadEditor = async (version, destination) => {
   const resp2 = await fetch(`https://github.com/learnpack/coding-ide/blob/${version}/dist`)
   if(!resp2.ok) throw InternalError(`Coding Editor v${version} was not found on learnpack repository, check the config.editor.version property on learn.json`)
 
-  Console.info("Downloading the LearnPack coding UI, this may take a minute...")
+  Console.info(`Downloading the LearnPack coding UI v${version}, this may take a minute...`)
   return await download(`https://github.com/learnpack/coding-ide/blob/${version}/dist/app.tar.gz?raw=true`, destination)
 }
 

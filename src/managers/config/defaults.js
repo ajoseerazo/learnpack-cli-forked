@@ -11,6 +11,7 @@ module.exports = {
         configPath: './learn.json',
         outputPath: './.learn/dist',
         publicPath: '/preview',
+        publicUrl: 'http://localhost',
         grading: 'isolated', // [isolated, incremental]
         exercisesPath: './', // path to the folder that contains the exercises
         webpackTemplate: null, // if you want webpack to use an HTML template

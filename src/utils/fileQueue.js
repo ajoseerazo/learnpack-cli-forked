@@ -6,10 +6,10 @@ const XXH = require('xxhashjs')
 // possible events to dispatch
 let events = {
     START_EXERCISE: "start_exercise",
-    RESET_EXERCISE: "reset_exercise",
     INIT: "initializing",
     RUNNING: "configuration_loaded",
     END: "connection_ended",
+    RESET_EXERCISE: "reset_exercise",
     OPEN_FILES: "open_files",
     OPEN_WINDOW: "open_window",
     INSTRUCTIONS_CLOSED: "instructions_closed"
@@ -54,6 +54,7 @@ const loadDispatcher = (opts) => {
 
 
 const enqueue = (name, data) => {
+
     
     if(!Object.values(events).includes(name)){
         logger.debug(`Invalid event ${name}`)
@@ -64,7 +65,7 @@ const enqueue = (name, data) => {
     
     actions.push({ name, time: now(), data: data })
     logger.debug(`EMIT -> ${name}:Exporting changes to ${options.path}`)
-    
+
     return fs.writeFileSync(options.path, JSON.stringify(actions)) 
 }
 const now = () => {
@@ -72,6 +73,9 @@ const now = () => {
     return hrTime[0] * 1000000 + hrTime[1] / 1000
 }
 const loadFile = (filePath) => {
+    
+    if(!fs.existsSync(filePath)) throw Error(`No queue.json file to load on ${filePath}`);
+
     const content = fs.readFileSync(filePath, 'utf8')
     const newHash = XXH.h32( content, 0xABCD ).toString(16);
     const isUpdated = lastHash != newHash
@@ -87,7 +91,13 @@ const dequeue = () => {
     
     const { isUpdated, incomingActions } = loadFile(options.path, 'utf8')
 
-    if(!isUpdated && actions.length === incomingActions.length){
+    if(!isUpdated){
+
+        /**
+         * make sure no tasks are executed from the queue by matching both
+         * queues (the incoming with current one)
+         */
+        actions = incomingActions
         logger.debug(`No new actions to process: ${actions.length}/${incomingActions.length}`)
         return null
     }
@@ -115,8 +125,10 @@ const pull = (callback) => {
 const reset = (callback) => {
     logger.debug("Queue reseted")
     actions = []
-    const success = fs.writeFileSync(options.path, "[]") 
-    if(success) callback()
+    if(fs.existsSync(options.path)){
+        const success = fs.writeFileSync(options.path, "[]") 
+        if(success) callback()
+    }
 }
 
 const onPull = (callback) => {
@@ -124,6 +136,11 @@ const onPull = (callback) => {
     const chokidar = require('chokidar')
 
     logger.debug("Starting to listen...")
+    try{
+        loadFile(options.path)
+    }catch{
+        logger.debug("No previeues queue file, waiting for it to be created...")
+    }
 
     if(!watcher){
         logger.debug(`Watching ${options.path}`)
