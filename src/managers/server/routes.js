@@ -86,7 +86,7 @@ module.exports = async function(app, configObject, configManager){
             const entries = Object.keys(config.entries).map(lang => config.entries[lang]);
             const scanedFiles = fs.readdirSync(`./`);
             const onlyEntries = scanedFiles.filter(fileName => entries.includes(fileName));
-            const detected = detect(config, onlyEntries);
+            const detected = detect(configObject, onlyEntries);
 
             // update the file hierarchy with updates
             exercise.files = exercise.files.filter(f => f.name.includes("test.")).concat(filterFiles(scanedFiles))
@@ -108,8 +108,7 @@ module.exports = async function(app, configObject, configManager){
 
         if(!exercise.entry){
             socket.removeAllowed("build")
-            Console.error(`No entry was found for this exercise ${req.params.slug}, looking for the following entries from the config: `)
-            Console.log(config.entries)
+            Console.debug(`No entry was found for this exercise ${req.params.slug}, looking for the following entries from the config: `, config.entries)
         }
         else socket.addAllowed('build')
 

@@ -135,6 +135,8 @@ const detect = (configObject, files) => {
 
     const { config } = configObject;
 
+    if(!config) throw Error(`No configuration found during the engine detection`)
+    
     if(!config.entries) throw Error("No configuration found for entries, please add a 'entries' object with the default file name for your exercise entry file that is going to be used while compiling, for example: index.html for html, app.py for python3, etc.")
     //A language was found on the config object, but this language will only be used as last resort, learnpack will try to guess each exercise language independently based on file extension (js, jsx, html, etc.)
 
