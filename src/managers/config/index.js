@@ -78,8 +78,9 @@ module.exports = async ({ grading, mode, disableGrading, version }) => {
       configObj.config.publicUrl = `https://${configObj.config.port}-${configObj.config.address.substring(8)}`
     }else if(!configObj.config.editor.agent){
       configObj.config.editor.agent = "localhost";
-      configObj.config.publicUrl = `${config.address}:${config.port}`
     }
+
+    if(!configObj.config.publicUrl) configObj.config.publicUrl = `${configObj.config.address}:${configObj.config.port}`
 
     // Assign default editor mode if not set already
     if(mode != null){
