@@ -59,10 +59,21 @@ module.exports = {
       this.emit('clean','pending',logs);
     },
     ask: function(questions=[]){
-
       return new Promise((resolve, reject) => {
         this.emit('ask','pending', ["Waiting for input..."], questions);
-        this.on('input', ({ inputs }) => resolve(inputs));
+        this.on('input', ({ inputs }) => {
+          // Workaround to fix issue because null inputs
+          let isNull = false;
+          inputs.forEach((input) => {
+            if (input === null) {
+             isNull = true; 
+            }
+          });
+
+          if (!isNull) {
+            resolve(inputs)
+          }
+        });
       })
     },
     reload: function(files=null, exercises=null){
