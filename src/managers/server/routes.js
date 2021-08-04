@@ -46,13 +46,15 @@ module.exports = async function(app, configObject, configManager){
     }))
 
     //symbolic link to maintain path compatiblity
-    app.get('/assets/:filePath', withHandler((req, res) => {
+    const fetchStaticAsset = withHandler((req, res) => {
         let filePath = `${config.dirPath}/assets/${req.params.filePath}`
         if (!fs.existsSync(filePath)) throw Error('File not found: '+filePath)
         const content = fs.readFileSync(filePath)
         res.write(content);
         res.end();
-    }));
+    })
+    app.get(`${config.dirPath.indexOf("./") === 0 ? config.dirPath.substring(1) : config.dirPath}/assets/:filePath`, fetchStaticAsset);
+    app.get('/assets/:filePath', fetchStaticAsset);
 
     app.get('/exercise', withHandler((req, res) => {
         res.json(configObject.exercises)
