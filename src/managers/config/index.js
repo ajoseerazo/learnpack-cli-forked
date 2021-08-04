@@ -171,6 +171,12 @@ module.exports = async ({ grading, mode, disableGrading, version }) => {
           configObj.currentExercise = exercise.slug
 
           this.save()
+
+          exercise.files.forEach(f => {
+            const _path = configObj.config.outputPath + "/" + f.name;
+            if(f.hidden === false && fs.existsSync(_path)) fs.unlinkSync(_path)
+          })
+
           return exercise
         },
         noCurrentExercise: function(){

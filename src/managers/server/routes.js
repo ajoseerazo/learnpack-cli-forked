@@ -79,29 +79,33 @@ module.exports = async function(app, configObject, configManager){
 
         let exercise = configManager.startExercise(req.params.slug)
         dispatcher.enqueue(dispatcher.events.START_EXERCISE, req.params.slug)
+
+        const entries = Object.keys(config.entries).map(lang => config.entries[lang]);
         
         // if we are in incremental grading, the entry file can by dinamically detected
         // based on the changes the student is making during the exercise
         if(config.grading === "incremental"){
-            const entries = Object.keys(config.entries).map(lang => config.entries[lang]);
             const scanedFiles = fs.readdirSync(`./`);
-            const onlyEntries = scanedFiles.filter(fileName => entries.includes(fileName));
-            const detected = detect(configObject, onlyEntries);
-
+            
             // update the file hierarchy with updates
             exercise.files = exercise.files.filter(f => f.name.includes("test.")).concat(filterFiles(scanedFiles))
             Console.debug(`Exercise updated files: `, exercise.files)
-            //if a new language for the testing engine is detected, we replace it
-            // if not we leave it as it was before
-            if(detected.language){
-                Console.debug(`Switching to ${detected.language} engine in this exercise`)
-                exercise.language = detected.language;
-            } 
-
-            // WARNING: has to be the FULL PATH to the entry path
-            exercise.entry = detected.entry;
-            Console.debug(`Exercise detected entry: ${detected.entry}`)
+            
         }
+        // detect lang
+        const detected = detect(configObject, exercise.files.filter(fileName => entries.includes(fileName.name || fileName)).map(f => f.name || f));
+        
+        //if a new language for the testing engine is detected, we replace it
+        // if not we leave it as it was before
+        if(detected.language && (!configObject.language || configObject.language === "auto")){
+            Console.debug(`Switching to ${detected.language} engine in this exercise`)
+            exercise.language = detected.language;
+        } 
+
+        // WARNING: has to be the FULL PATH to the entry path
+        // We need to detect entry in both gradings: Incremental and Isolate
+        exercise.entry = detected.entry;
+        Console.debug(`Exercise detected entry: ${detected.entry}`)
 
         if(!exercise.graded || config.disableGrading) socket.removeAllowed("test")
         else socket.addAllowed('test')

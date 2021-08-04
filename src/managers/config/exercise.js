@@ -157,15 +157,15 @@ const detect = (configObject, files) => {
         language: "react",
         entry: hasFiles.find(f => config.entries["react"] === f)
     }
-
     const hasHTML = files.filter(f => f.includes('index.html'))
+    const hasIndexJS = files.find(f => f.includes('index.js'))
     const hasJS = files.filter(f => f.includes('.js'))
     // angular, vue, vanillajs needs to have at least 2 files (html,css,js),
     // the test.js and the entry file in js
     // if not its just another HTML
-    if(hasJS.length > 1 && hasHTML.length > 0) return {
-        language: configObject.language || "vanillajs",
-        entry: hasHTML.find(f => config.entries[configObject.language || "vanillajs"] === f)
+    if(hasIndexJS && hasHTML.length > 0) return {
+        language: "vanillajs",
+        entry: hasIndexJS
     }
     else if(hasHTML.length > 0) return {
         language: "html",
@@ -175,9 +175,9 @@ const detect = (configObject, files) => {
         language: "node",
         entry: hasJS.find(f => config.entries["node"] === f)
     }
-
+    
     return {
-        language: configObject.language || null,
+        language: null,
         entry: null
     };
 }

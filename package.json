@@ -1,7 +1,7 @@
 {
   "name": "learnpack",
   "description": "Seamlessly build or take interactive & auto-graded tutorials, start learning now or build a tutorial.",
-  "version": "0.1.9",
+  "version": "0.1.12",
   "author": "Alejandro Sanchez @alesanchezr",
   "bin": {
     "learnpack": "./bin/run"
@@ -55,11 +55,18 @@
     "/bin",
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json",
+    "/plugin",
     "/src"
   ],
   "homepage": "https://learnpack.co",
   "keywords": [
-    "learn", "learn to code", "tutorial", "tutorials", "coding tutorials", "education", "coding education"
+    "learn",
+    "learn to code",
+    "tutorial",
+    "tutorials",
+    "coding tutorials",
+    "education",
+    "coding education"
   ],
   "license": "https://learnpack.co/terms",
   "main": "src/index.js",
