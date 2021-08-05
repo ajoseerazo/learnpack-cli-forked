@@ -28,6 +28,10 @@ const withHandler = (func) => (req, res) => {
 module.exports = async function(app, configObject, configManager){
 
     const { config } = configObject;
+
+    // Dispatcher will communicate events to 3rd party apps that
+    // subscribe to the queue, you can read documentation about this queue here:
+    // https://github.com/alesanchezr/text-queue/blob/main/README.md
     const dispatcher = queue.dispatcher({ create: true, path: `${config.dirPath}/vscode_queue.json` })
 
     app.get('/config', withHandler((req, res)=>{
