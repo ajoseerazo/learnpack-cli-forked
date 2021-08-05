@@ -46,7 +46,8 @@
     "eslint-config-oclif": "^3.1.0",
     "globby": "^10.0.2",
     "mocha": "^5.2.0",
-    "nyc": "^14.1.1"
+    "nyc": "^14.1.1",
+    "pre-commit": "^1.2.2"
   },
   "engines": {
     "node": ">=12.0.0"
@@ -76,8 +77,7 @@
     "plugins": [
       "@oclif/plugin-help",
       "@oclif/plugin-plugins",
-      "@oclif/plugin-warn-if-update-available",
-      "learnpack-python"
+      "@oclif/plugin-warn-if-update-available"
     ],
     "permanent_plugins": [
       "@oclif/plugin-help",
@@ -86,9 +86,14 @@
     ]
   },
   "repository": "learnpack/learnpack-cli",
+  "pre-commit": {
+    "silent": true,
+    "run": ["pre"]
+  },
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint .",
+    "pre": "node ./test/precommit/index.js",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "test": "nyc mocha --forbid-only \"test/**/*.test.js\"",
     "version": "oclif-dev readme && git add README.md"
