@@ -4,6 +4,7 @@ const linkCheck = require('link-check');
 const { flags } = require('@oclif/command')
 const Console = require('../utils/console')
 const SessionCommand = require('../utils/SessionCommand');
+const { exercise } = require('../managers/config/exercise');
 
 class AuditCommand extends SessionCommand {
     async init() {
@@ -13,20 +14,19 @@ class AuditCommand extends SessionCommand {
     async run() {
         const { flags } = this.parse(AuditCommand)
 
+        Console.log("Running command audit...")
+
         // These two lines check if the 'slug' property is inside the configuration object.
         Console.debug("Checking if the slug property is inside the configuration object...")
-        if (this.configManager.get().slug) Console.success("The slug property is inside the configuration object")
-        else Console.error("The slug property is not in the configuration object")
+        if (!this.configManager.get().slug) Console.error("The slug property is not in the configuration object")
 
         // These two lines check if the 'repository' property is inside the configuration object.
         Console.debug("Checking if the repository property is inside the configuration object...")
-        if (this.configManager.get().repository) Console.success("The repository property is inside the configuration object")
-        else Console.error("The repository property is not in the configuration object")
+        if (!this.configManager.get().repository) Console.error("The repository property is not in the configuration object")
 
         // These two lines check if the 'description' property is inside the configuration object.
         Console.debug("Checking if the description property is inside the configuration object...")
-        if (this.configManager.get().description) Console.success("The description property is inside the configuration object")
-        else Console.error("The description property is not in the configuration object")
+        if (!this.configManager.get().description) Console.error("The description property is not in the configuration object")
 
         const findInFile = (types, content) => {
 
@@ -75,6 +75,10 @@ class AuditCommand extends SessionCommand {
         }
 
         const checkUrl = (file) => {
+            if(!fs.existsSync(file.path)) {
+                Console.error(`This file doesnt exist. File: ${file.path}`)
+                return false;
+            }
             const content = fs.readFileSync(file.path).toString();
             const findings = findInFile(["relative_images", "external_images", "markdown_links"], content);
             for (const finding in findings) {
@@ -104,21 +108,28 @@ class AuditCommand extends SessionCommand {
                     }
                 }
             }
+            return true
         }
 
-        // Validates if images and links are working.
+        // Validates if images and links are working at every README file.
         let exercises = this.configManager.get().exercises
+        let readmeFiles = []
         exercises ? exercises.map(exercise => {
+            let readmeFilesCount = 0;
             for(const lang in exercise.translations){
                 if (!exercise.files.find(file => {
                     if (file.name == exercise.translations[lang]) {
-                        checkUrl(file)
+                        if(checkUrl(file)) readmeFilesCount++
                         return true
                     }
                     return false;
                 })) Console.error(`The exercise ${exercise.title} doesn't have a README.md file.`)
             }
+            readmeFiles.push(readmeFilesCount)
         }) : Console.error("The exercises array is empty.")
+        
+        // Check if all the exercises has the same ammount of README's, this way we can check if they have the same ammount of translations.
+        if(!readmeFiles.every((item, index, arr)=> item == arr[0])) Console.info(`Some exercises are missing translations.`)
 
         // Checks if the .gitignore file exists.
         if (!fs.existsSync(`.gitignore`)) Console.info(".gitignore file doesn't exist")
