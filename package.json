@@ -45,6 +45,7 @@
     "eslint": "^5.16.0",
     "eslint-config-oclif": "^3.1.0",
     "globby": "^10.0.2",
+    "link-check": "^5.0.0",
     "mocha": "^5.2.0",
     "nyc": "^14.1.1",
     "pre-commit": "^1.2.2"
@@ -88,7 +89,9 @@
   "repository": "learnpack/learnpack-cli",
   "pre-commit": {
     "silent": true,
-    "run": ["pre"]
+    "run": [
+      "pre"
+    ]
   },
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
