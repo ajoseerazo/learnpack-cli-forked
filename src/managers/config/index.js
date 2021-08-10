@@ -146,6 +146,9 @@ module.exports = async ({ grading, mode, disableGrading, version }) => {
 
           rmSync(configObj.config.outputPath);
           rmSync(configObj.config.dirPath+"/_app");
+          rmSync(configObj.config.dirPath+"/reports");
+          rmSync(configObj.config.dirPath+"/.session");
+          rmSync(configObj.config.dirPath+"/resets");
 
           // clean tag gz
           if (fs.existsSync(configObj.config.dirPath+"/app.tar.gz"))

@@ -103,7 +103,11 @@ module.exports = async function(app, configObject, configManager){
         
         //if a new language for the testing engine is detected, we replace it
         // if not we leave it as it was before
-        if(detected.language && (!configObject.language || configObject.language === "auto")){
+        if(configObject.language && !["", "auto"].includes(configObject.language)){
+            Console.debug(`Exercise language ignored, instead imported from configuration ${configObject.language}`)
+            exercise.language = detected.language;
+        }
+        else if(detected.language && (!configObject.language || configObject.language === "auto")){
             Console.debug(`Switching to ${detected.language} engine in this exercise`)
             exercise.language = detected.language;
         } 
@@ -111,7 +115,7 @@ module.exports = async function(app, configObject, configManager){
         // WARNING: has to be the FULL PATH to the entry path
         // We need to detect entry in both gradings: Incremental and Isolate
         exercise.entry = detected.entry;
-        Console.debug(`Exercise detected entry: ${detected.entry}`)
+        Console.debug(`Exercise detected entry: ${detected.entry} and language ${exercise.language}`)
 
         if(!exercise.graded || config.disableGrading) socket.removeAllowed("test")
         else socket.addAllowed('test')
