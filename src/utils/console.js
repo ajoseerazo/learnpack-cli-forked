@@ -9,6 +9,7 @@ module.exports = {
     success: (msg, ...args) => console.log(chalk.green('✓ '+msg), ...args),
     info: (msg, ...args) => console.log(chalk.blue('ⓘ '+msg), ...args),
     help: (msg) => console.log(`${chalk.white.bold('⚠ help:')} ${chalk.white(msg)}`),
+    warning: (msg) => console.log(`${chalk.yellow('⚠ warning:')} ${chalk.yellow(msg)}`),
     debug(...args){
         this._debug && console.log(chalk.magentaBright(`⚠ debug: `), args)
     }

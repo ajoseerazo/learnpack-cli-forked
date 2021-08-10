@@ -4,7 +4,7 @@ const linkCheck = require('link-check');
 const { flags } = require('@oclif/command')
 const Console = require('../utils/console')
 const SessionCommand = require('../utils/SessionCommand');
-const { exercise } = require('../managers/config/exercise');
+const fm = require("front-matter")
 
 class AuditCommand extends SessionCommand {
     async init() {
@@ -16,17 +16,20 @@ class AuditCommand extends SessionCommand {
 
         Console.log("Running command audit...")
 
+        let errors = []
+        let warnings = []
+
         // These two lines check if the 'slug' property is inside the configuration object.
         Console.debug("Checking if the slug property is inside the configuration object...")
-        if (!this.configManager.get().slug) Console.error("The slug property is not in the configuration object")
+        if (!this.configManager.get().slug) errors.push("The slug property is not in the configuration object")
 
         // These two lines check if the 'repository' property is inside the configuration object.
         Console.debug("Checking if the repository property is inside the configuration object...")
-        if (!this.configManager.get().repository) Console.error("The repository property is not in the configuration object")
+        if (!this.configManager.get().repository) errors.push("The repository property is not in the configuration object")
 
         // These two lines check if the 'description' property is inside the configuration object.
         Console.debug("Checking if the description property is inside the configuration object...")
-        if (!this.configManager.get().description) Console.error("The description property is not in the configuration object")
+        if (!this.configManager.get().description) errors.push("The description property is not in the configuration object")
 
         const findInFile = (types, content) => {
 
@@ -75,11 +78,16 @@ class AuditCommand extends SessionCommand {
         }
 
         const checkUrl = (file) => {
-            if(!fs.existsSync(file.path)) {
-                Console.error(`This file doesnt exist. File: ${file.path}`)
-                return false;
-            }
+            if(!fs.existsSync(file.path)) return false
             const content = fs.readFileSync(file.path).toString();
+            const frontmatter = fm(content).attributes
+            for(const attribute in frontmatter){
+                if(attribute === "intro" || attribute ==="tutorial"){
+                    request(frontmatter[attribute], (error) => error && errors.push(`Cannot access to this video: ${frontmatter[attribute]}`));
+                }
+            }
+
+            // Check url's of each README file.
             const findings = findInFile(["relative_images", "external_images", "markdown_links"], content);
             for (const finding in findings) {
                 let obj = findings[finding];
@@ -87,23 +95,23 @@ class AuditCommand extends SessionCommand {
                     // Valdites all the relative path images.
                     for (const img in obj) {
                         // Validates if the path is correct
-                        if (obj[img].absUrl !== "../../") Console.error(`The path for this image (${obj[img].relUrl}) is incorrect`)
-
+                        if (obj[img].absUrl !== "../../") errors.push(`The path for this image (${obj[img].relUrl}) is incorrect`)
+                        
                         // Validates if the image is in the assets folder.
-                        if (!fs.existsSync(obj[img].relUrl)) Console.error(`The file ${obj[img].relUrl} doesn't exist in the assets folder.`)
+                        if (!fs.existsSync(obj[img].relUrl)) errors.push(`The file ${obj[img].relUrl} doesn't exist in the assets folder.`)
                     }
-                } else if (finding === "absolut_images" && Object.keys(obj).length > 0) {
+                } else if (finding === "external_images" && Object.keys(obj).length > 0) {
                     // Valdites all the aboslute path images.
-                    for (const img in obj) request(obj[img].absUrl, (error) => error && Console.error(`Cannot access to this image: ${obj[img].absUrl}`));
+                    for (const img in obj) request(obj[img].absUrl, (error) => error && errors.push(`Cannot access to this image: ${obj[img].absUrl}`));
                 } else if (finding === "markdown_links" && Object.keys(obj).length > 0) {
-                    // This still not working
+                    // This was working but linkCheck, stopped working
                     for (const link in obj) {
                         linkCheck(obj[link].mdUrl, function (err, result) {
                             if (err) {
-                                Console.error(err);
+                                errors.push(err);
                                 return;
                             }
-                            if (result.status === "dead") Console.error(`This link is broken: ${result.link}`)
+                            if (result.status === "dead") errors.push(`This link is broken: ${result.link}`)
                         });
                     }
                 }
@@ -123,16 +131,35 @@ class AuditCommand extends SessionCommand {
                         return true
                     }
                     return false;
-                })) Console.error(`The exercise ${exercise.title} doesn't have a README.md file.`)
+                })) errors.push(`The exercise ${exercise.title} doesn't have a README.md file.`)
             }
             readmeFiles.push(readmeFilesCount)
-        }) : Console.error("The exercises array is empty.")
+        }) : errors.push("The exercises array is empty.")
         
         // Check if all the exercises has the same ammount of README's, this way we can check if they have the same ammount of translations.
-        if(!readmeFiles.every((item, index, arr)=> item == arr[0])) Console.info(`Some exercises are missing translations.`)
+        if(!readmeFiles.every((item, index, arr)=> item == arr[0])) warnings.push(`Some exercises are missing translations.`)
 
         // Checks if the .gitignore file exists.
-        if (!fs.existsSync(`.gitignore`)) Console.info(".gitignore file doesn't exist")
+        if (!fs.existsSync(`.gitignore`)) warnings.push(".gitignore file doesn't exist")
+
+        if(warnings.length > 0){
+            Console.log("Checking for warnings...")
+            warnings.forEach((warning, i) => {
+                Console.warning(`${i+1}) ${warning}`)
+            })
+        }
+
+        if(errors.length > 0) {
+            Console.log("Checking for errors...")
+            errors.forEach((error, i) => {
+                Console.error(`${i+1}) ${error}`)
+            })
+            process.exit(1)
+        } else {
+            Console.success("We didn't find any errors in this repository.")
+            process.exit(0)
+        }
+
     }
 }
 
