@@ -163,6 +163,7 @@ const detect = (configObject, files) => {
     // angular, vue, vanillajs needs to have at least 2 files (html,css,js),
     // the test.js and the entry file in js
     // if not its just another HTML
+    
     if(hasIndexJS && hasHTML.length > 0) return {
         language: "vanillajs",
         entry: hasIndexJS
