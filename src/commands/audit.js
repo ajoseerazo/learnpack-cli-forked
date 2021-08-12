@@ -16,26 +16,28 @@ class AuditCommand extends SessionCommand {
 
         Console.log("Running command audit...")
 
-        // Build exercises
-        this.configManager.buildIndex()
+        // Build exercises if they are not built yet.
+        if(!this.configManager.get().exercises) this.configManager.buildIndex()
+
+        // Get configuration object.
+        const config = this.configManager.get();
 
         let errors = []
         let warnings = []
 
-        // These two lines check if the 'slug' property is inside the configuration object.
-        Console.debug("Checking if the slug property is inside the configuration object...")
-        if (!this.configManager.get().slug) errors.push({exercise: null, msg: "The slug property is not in the configuration object"})
-
-        // These two lines check if the 'repository' property is inside the configuration object.
-        Console.debug("Checking if the repository property is inside the configuration object...")
-        if (!this.configManager.get().repository) errors.push({exercise: null, msg: "The repository property is not in the configuration object"})
-
-        // These two lines check if the 'description' property is inside the configuration object.
-        Console.debug("Checking if the description property is inside the configuration object...")
-        if (!this.configManager.get().description) errors.push({exercise: null, msg: "The description property is not in the configuration object"})
-
+        // This function checks if a url is valid.
+        async function isUrl(url){
+            let regex_url = /(https?:\/\/[a-zA-Z_\-.\/0-9]+)/gm
+            if(!regex_url.exec(url)) {
+                errors.push({exercise: null, msg: `The repository value of the configuration file is not a link: ${url}`})
+                return false;
+            }
+            doRequest(url).catch((err) => errors.push(errors.push({exercise: null, msg: `The link of the repository is broken: ${url}`})))
+            return true;
+        }
+        
         const findInFile = (types, content) => {
-
+            
             const regex = {
                 relative_images: /!\[.*\]\s*\(((\.\/)?(\.{2}\/){1,5})(.*\.[a-zA-Z]{2,4}).*\)/gm,
                 external_images: /!\[.*\]\((https?:\/(\/{1}[^/)]+)+\/?)\)/gm,
@@ -53,9 +55,9 @@ class AuditCommand extends SessionCommand {
                 if (!validTypes.includes(type)) throw Error("Invalid type: " + type)
                 else findings[type] = {};
             });
-
+            
             types.forEach(type => {
-
+                
                 let count = 0;
                 let m;
                 while ((m = regex[type].exec(content)) !== null) {
@@ -67,7 +69,7 @@ class AuditCommand extends SessionCommand {
                     // The result can be accessed through the `m`-variable.
                     // m.forEach((match, groupIndex) => values.push(match));
                     count++;
-
+                    
                     findings[type][m[0]] = {
                         content: m[0],
                         absUrl: m[1],
@@ -113,7 +115,7 @@ class AuditCommand extends SessionCommand {
                     for (const img in obj) {
                         // Validates if the path is correct
                         if (obj[img].absUrl !== "../../" || obj[img].absUrl !== "./../../") errors.push({exercise: exercise, msg: `The path for this image (${obj[img].relUrl}) is incorrect`})
-
+                        
                         // Validates if the image is in the assets folder.
                         if (!fs.existsSync(obj[img].relUrl)) errors.push({exercise: exercise, msg: `The file ${obj[img].relUrl} doesn't exist in the assets folder.`})
                     }
@@ -131,7 +133,7 @@ class AuditCommand extends SessionCommand {
             }
             return true
         }
-
+        
         // This function is being created because the find method doesn't work with promises.
         async function find(file, lang, exercise){
             if(file.name === lang){
@@ -140,14 +142,14 @@ class AuditCommand extends SessionCommand {
             }
             return false
         }
-
+        
         // This function checks if there are errors, and show them in the console at the end.
         function showErrors(errors) {
             return new Promise((resolve, reject) => {
                 if (errors) {
                     if (errors.length > 0) {
                         Console.log("Checking for errors...")
-                        errors.forEach((error, i) => Console.error(`${i + 1}) ${error.msg} ${error.exercise && `(Exercise: ${error.exercise})`}`))
+                        errors.forEach((error, i) => Console.error(`${i + 1}) ${error.msg} ${error.exercise != null ? `(Exercise: ${error.exercise})` : ""}`))
                         process.exit(1)
                     } else {
                         Console.success("We didn't find any errors in this repository.")
@@ -174,9 +176,22 @@ class AuditCommand extends SessionCommand {
                 }
             })
         }
+
+        // These two lines check if the 'slug' property is inside the configuration object.
+        Console.debug("Checking if the slug property is inside the configuration object...")
+        if (!config.slug) errors.push({exercise: null, msg: "The slug property is not in the configuration object"})
+
+        // These two lines check if the 'repository' property is inside the configuration object.
+        Console.debug("Checking if the repository property is inside the configuration object...")
+        if (!config.repository) errors.push({exercise: null, msg: "The repository property is not in the configuration object"})
+        else isUrl(config.repository)
+
+        // These two lines check if the 'description' property is inside the configuration object.
+        Console.debug("Checking if the description property is inside the configuration object...")
+        if (!config.description) errors.push({exercise: null, msg: "The description property is not in the configuration object"})
         
         // Validates if images and links are working at every README file.
-        let exercises = this.configManager.get().exercises
+        let exercises = config.exercises
         let readmeFiles = []
 
         if(exercises.length > 0){
