@@ -1,5 +1,4 @@
 const fs = require('fs')
-const request = require('request');
 const fetch = require('node-fetch')
 const { flags } = require('@oclif/command')
 const Console = require('../utils/console')
@@ -76,8 +75,6 @@ class AuditCommand extends SessionCommand {
             }
             return false
         }
-
-
 
         // These two lines check if the 'slug' property is inside the configuration object.
         Console.debug("Checking if the slug property is inside the configuration object...")

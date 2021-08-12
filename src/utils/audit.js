@@ -1,6 +1,4 @@
 const Console = require('./console')
-const fm = require("front-matter")
-const fs = require('fs')
 const fetch = require('node-fetch')
 
 
