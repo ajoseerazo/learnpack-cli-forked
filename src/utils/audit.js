@@ -1,0 +1,93 @@
+const Console = require('./console')
+const fetch = require('node-fetch')
+
+
+module.exports = {
+    // This function checks if a url is valid.
+    isUrl: async (url, errors) => {
+        let regex_url = /(https?:\/\/[a-zA-Z_\-.\/0-9]+)/gm
+        if (!regex_url.exec(url)) {
+            errors.push({ exercise: null, msg: `The repository value of the configuration file is not a link: ${url}` })
+            return false;
+        }
+        let res = await fetch(url, { method: "HEAD" });
+        if (!res.ok) errors.push({ exercise: null, msg: `The link of the repository is broken: ${url}` })
+        return true;
+    },
+    findInFile: (types, content) => {
+        const regex = {
+            relative_images: /!\[.*\]\s*\(((\.\/)?(\.{2}\/){1,5})(.*\.[a-zA-Z]{2,4}).*\)/gm,
+            external_images: /!\[.*\]\((https?:\/(\/{1}[^/)]+)+\/?)\)/gm,
+            markdown_links: /(\s)+\[.*\]\((https?:\/(\/{1}[^/)]+)+\/?)\)/gm,
+            url: /(https?:\/\/[a-zA-Z_\-.\/0-9]+)/gm,
+            uploadcare: /https:\/\/ucarecdn.com\/(?:.*\/)*([a-zA-Z_\-.\/0-9]+)/gm
+        }
+
+        const validTypes = Object.keys(regex);
+        if (!Array.isArray(types)) types = [types];
+
+        let findings = {}
+
+        types.forEach(type => {
+            if (!validTypes.includes(type)) throw Error("Invalid type: " + type)
+            else findings[type] = {};
+        });
+
+        types.forEach(type => {
+
+            let count = 0;
+            let m;
+            while ((m = regex[type].exec(content)) !== null) {
+                // This is necessary to avoid infinite loops with zero-width matches
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                // The result can be accessed through the `m`-variable.
+                // m.forEach((match, groupIndex) => values.push(match));
+                count++;
+
+                findings[type][m[0]] = {
+                    content: m[0],
+                    absUrl: m[1],
+                    mdUrl: m[2],
+                    relUrl: m[4]
+                }
+            }
+        })
+
+        return findings;
+    },
+    // This function checks if there are errors, and show them in the console at the end.
+    showErrors: (errors) => {
+        return new Promise((resolve, reject) => {
+            if (errors) {
+                if (errors.length > 0) {
+                    Console.log("Checking for errors...")
+                    errors.forEach((error, i) => Console.error(`${i + 1}) ${error.msg} ${error.exercise != null ? `(Exercise: ${error.exercise})` : ""}`))
+                    process.exit(1)
+                } else {
+                    Console.success("We didn't find any errors in this repository.")
+                    process.exit(0)
+                }
+                resolve("SUCCESS")
+            } else {
+                reject("Failed")
+            }
+        })
+    },
+    // This function checks if there are warnings, and show them in the console at the end.
+    showWarnings: (warnings) => {
+        return new Promise((resolve, reject) => {
+            if (warnings) {
+                if (warnings.length > 0) {
+                    Console.log("Checking for warnings...")
+                    warnings.forEach((warning, i) => Console.warning(`${i + 1}) ${warning}`))
+                }
+                resolve("SUCCESS")
+            } else {
+                reject("Failed")
+            }
+        })
+    }
+}

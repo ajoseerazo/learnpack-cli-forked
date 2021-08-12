@@ -28,7 +28,7 @@ class StartCommand extends SessionCommand {
     const configObject = this.configManager.get()
     const { config } = configObject;
 
-    // build exerises
+    // build exercises
     this.configManager.buildIndex()
 
     Console.debug(`Grading: ${config.grading} ${config.disable_grading ? "(disabled)" : ""}, editor: ${config.editor.mode} ${config.editor.version}, for ${Array.isArray(config.exercises) ? config.exercises.length : 0} exercises found`)
