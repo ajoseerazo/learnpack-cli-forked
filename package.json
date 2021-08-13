@@ -34,6 +34,7 @@
     "shelljs": "^0.8.4",
     "socket.io": "^2.3.0",
     "targz": "^1.0.1",
+    "front-matter": "^4.0.2",
     "validator": "^13.1.1",
     "xxhashjs": "^0.2.2"
   },
@@ -43,7 +44,6 @@
     "chai": "^4.2.0",
     "eslint": "^5.16.0",
     "eslint-config-oclif": "^3.1.0",
-    "front-matter": "^4.0.2",
     "globby": "^10.0.2",
     "mocha": "^5.2.0",
     "nyc": "^14.1.1",
