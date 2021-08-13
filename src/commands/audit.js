@@ -111,9 +111,13 @@ class AuditCommand extends SessionCommand {
         } else errors.push({ exercise: null, msg: "The exercises array is empty." })
 
         // Check if all the exercises has the same ammount of README's, this way we can check if they have the same ammount of translations.
+        let files = [];
+        Console.log(readmeFiles)
         readmeFiles.map((item, i, arr) => {
-            if(item.count !== arr[0].count) warnings.push({exercise: item.exercise, msg: `This exercise is missing translations.`})
+            if(item.count !== arr[0].count) files.push(` ${item.exercise}`)
         })
+        files.join()
+        warnings.push({exercise: null, msg: `These exercises are missing translations:${files}`})
 
         // Checks if the .gitignore file exists.
         if (!fs.existsSync(`.gitignore`)) warnings.push(".gitignore file doesn't exist")
