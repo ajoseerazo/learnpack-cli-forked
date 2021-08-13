@@ -21,7 +21,7 @@ class AuditCommand extends SessionCommand {
 
         // Get configuration object.
         const config = this.configManager.get();
-
+        
         let errors = []
         let warnings = []
 
@@ -44,11 +44,8 @@ class AuditCommand extends SessionCommand {
                 if (finding === "relative_images" && Object.keys(obj).length > 0) {
                     // Valdites all the relative path images.
                     for (const img in obj) {
-                        // Validates if the path is correct
-                        if (obj[img].absUrl !== "../../" || obj[img].absUrl !== "./../../") errors.push({ exercise: exercise, msg: `The path for this image (${obj[img].relUrl}) is incorrect` })
-
                         // Validates if the image is in the assets folder.
-                        if (!fs.existsSync(obj[img].relUrl)) errors.push({ exercise: exercise, msg: `The file ${obj[img].relUrl} doesn't exist in the assets folder.` })
+                        if (!fs.existsSync(`./.learn/assets/${obj[img].relUrl}`)) errors.push({ exercise: exercise, msg: `The file ${obj[img].relUrl} doesn't exist in the assets folder.` })
                     }
                 } else if (finding === "external_images" && Object.keys(obj).length > 0) {
                     // Valdites all the aboslute path images.
@@ -96,14 +93,14 @@ class AuditCommand extends SessionCommand {
         if (exercises.length > 0) {
             for (const index in exercises) {
                 let exercise = exercises[index]
-                let readmeFilesCount = 0;
+                let readmeFilesCount = {exercise: exercise.title,count: 0};
                 if (Object.keys(exercise.translations).length == 0) errors.push({ exercise: exercise.title, msg: `The exercise ${exercise.title} doesn't have a README.md file.` })
 
                 for (const lang in exercise.translations) {
                     let files = []
                     for (const file of exercise.files) {
                         let found = await find(file, exercise.translations[lang], exercise.title)
-                        if (found == true) readmeFilesCount++
+                        if (found == true) readmeFilesCount = {...readmeFilesCount, count: readmeFilesCount.count+1}
                         files.push(found)
                     }
                     if (!files.includes(true)) errors.push({ exercise: exercise.title, msg: `This exercise doesn't have a README.md file.` })
@@ -114,7 +111,9 @@ class AuditCommand extends SessionCommand {
         } else errors.push({ exercise: null, msg: "The exercises array is empty." })
 
         // Check if all the exercises has the same ammount of README's, this way we can check if they have the same ammount of translations.
-        if (!readmeFiles.every((item, index, arr) => item == arr[0])) warnings.push(`Some exercises are missing translations.`)
+        readmeFiles.map((item, i, arr) => {
+            if(item.count !== arr[0].count) warnings.push({exercise: item.exercise, msg: `This exercise is missing translations.`})
+        })
 
         // Checks if the .gitignore file exists.
         if (!fs.existsSync(`.gitignore`)) warnings.push(".gitignore file doesn't exist")
