@@ -13,7 +13,7 @@ class Exercise {
     if (this.exercise.language) {
       socket.log(
         "testing",
-        `Testing exersice ${this.exercise.slug} using ${this.exercise.language} engine`
+        `Testing exercise ${this.exercise.slug} using ${this.exercise.language} engine`
       );
 
       sessionConfig.runHook("action", {
@@ -30,8 +30,8 @@ class Exercise {
 
 class ExercisesQueue {
   constructor(exercises) {
-    this.exercises = exercises.map((exersice) => {
-      return new Exercise(exersice);
+    this.exercises = exercises.map((exercise) => {
+      return new Exercise(exercise);
     });
   }
 
@@ -55,7 +55,7 @@ class TestCommand extends SessionCommand {
   }
   async run() {
     const {
-      args: { exersiceSlug },
+      args: { exerciseSlug },
     } = this.parse(TestCommand);
 
     // Build exercises index
@@ -64,23 +64,23 @@ class TestCommand extends SessionCommand {
     let exercises = [];
 
     // test all exercises
-    if (!exersiceSlug) {
+    if (!exerciseSlug) {
       exercises = this.configManager.getAllExercises();
     } else {
-      exercises = [this.configManager.getExercise(exersiceSlug)];
+      exercises = [this.configManager.getExercise(exerciseSlug)];
     }
 
-    const exersicesQueue = new ExercisesQueue(exercises);
+    const exercisesQueue = new ExercisesQueue(exercises);
 
     const configObject = this.configManager.get();
     configObject.config.port = 5000;
     configObject.config.test = true;
-    configObject.config.testingMultiple = !exersiceSlug;
+    configObject.config.testingMultiple = !exerciseSlug;
 
     let hasFailed = false;
     let failedTestsCount = 0;
     let successTestsCount = 0;
-    let testsToRunCount = exersicesQueue.size();
+    let testsToRunCount = exercisesQueue.size();
 
     configObject.config.testingFinishedCallback = ({ result }) => {
       if (result === "failed") {
@@ -90,7 +90,7 @@ class TestCommand extends SessionCommand {
         successTestsCount++;
       }
 
-      if (exersicesQueue.isEmpty()) {
+      if (exercisesQueue.isEmpty()) {
         Console.info(
           `${testsToRunCount} test${testsToRunCount > 1 ? "s" : ""} runned`
         );
@@ -103,7 +103,7 @@ class TestCommand extends SessionCommand {
 
         process.exit(hasFailed ? 1 : 0);
       } else {
-        exersicesQueue.pop().test(this.config, config, socket);
+        exercisesQueue.pop().test(this.config, config, socket);
       }
     };
 
@@ -113,17 +113,17 @@ class TestCommand extends SessionCommand {
 
     socket.start(config, server);
 
-    exersicesQueue.pop().test(this.config, config, socket);
+    exercisesQueue.pop().test(this.config, config, socket);
   }
 }
 
-TestCommand.description = `Test exersices`;
+TestCommand.description = `Test exercises`;
 
 TestCommand.args = [
   {
-    name: "exersiceSlug",
+    name: "exerciseSlug",
     required: false,
-    description: "The name of the exersice to test",
+    description: "The name of the exercise to test",
     hidden: false,
   },
 ];
