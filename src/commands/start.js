@@ -31,7 +31,7 @@ class StartCommand extends SessionCommand {
     // build exercises
     this.configManager.buildIndex()
 
-    Console.debug(`Grading: ${config.grading} ${config.disable_grading ? "(disabled)" : ""}, editor: ${config.editor.mode} ${config.editor.version}, for ${Array.isArray(config.exercises) ? config.exercises.length : 0} exercises found`)
+    Console.debug(`Grading: ${config.grading} ${config.disableGrading ? "(disabled)" : ""}, editor: ${config.editor.mode} ${config.editor.version}, for ${Array.isArray(config.exercises) ? config.exercises.length : 0} exercises found`)
 
     // download app and decompress
     let resp = await downloadEditor(config.editor.version, `${config.dirPath}/app.tar.gz`)
@@ -155,7 +155,7 @@ StartCommand.flags = {
   ...SessionCommand.flags,
   port: flags.string({char: 'p', description: 'server port' }),
   host: flags.string({char: 'h', description: 'server host' }),
-  disableGrading: flags.boolean({char: 'dg', description: 'disble grading functionality', default: false }),
+  disableGrading: flags.boolean({char: 'dg', description: 'disble grading functionality' }),
   watch: flags.boolean({char: 'w', description: 'Watch for file changes', default: false }),
   mode: flags.string({ char: 'm', description: 'Load a standalone editor or just the preview to be embeded in another editor: Choices: [standalone, preview]', options: ['standalone', 'preview'] }),
   version: flags.string({ char: 'v', description: 'E.g: 1.0.1', default: null }),

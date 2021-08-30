@@ -29,6 +29,7 @@ class SessionCommand extends BaseCommand {
     }
     async buildConfig(flags){
         Console.debug("Building configuration for the first time")
+        Console.debug("Flags", flags)
         this.configManager = await ConfigManager(flags)
     }
     async catch(err) {
