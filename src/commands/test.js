@@ -3,50 +3,7 @@ const SessionCommand = require("../utils/SessionCommand");
 const socket = require("../managers/socket.js");
 
 const createServer = require("../managers/server");
-
-class Exercise {
-  constructor(exercise) {
-    this.exercise = exercise;
-  }
-
-  test(sessionConfig, config, socket) {
-    if (this.exercise.language) {
-      socket.log(
-        "testing",
-        `Testing exercise ${this.exercise.slug} using ${this.exercise.language} engine`
-      );
-
-      sessionConfig.runHook("action", {
-        action: "test",
-        socket,
-        configuration: config,
-        exercise: this.exercise,
-      });
-    } else {
-      socket.onTestingFinised({ result: "success" });
-    }
-  }
-}
-
-class ExercisesQueue {
-  constructor(exercises) {
-    this.exercises = exercises.map((exercise) => {
-      return new Exercise(exercise);
-    });
-  }
-
-  pop() {
-    return this.exercises.shift();
-  }
-
-  isEmpty() {
-    return this.size() === 0;
-  }
-
-  size() {
-    return this.exercises.length;
-  }
-}
+const ExercisesQueue = require("../utils/exercisesQueue");
 
 class TestCommand extends SessionCommand {
   async init() {
@@ -59,7 +16,7 @@ class TestCommand extends SessionCommand {
     } = this.parse(TestCommand);
 
     // Build exercises index
-    this.configManager.buildIndex()
+    this.configManager.buildIndex();
 
     let exercises = [];
 
@@ -73,9 +30,6 @@ class TestCommand extends SessionCommand {
     const exercisesQueue = new ExercisesQueue(exercises);
 
     const configObject = this.configManager.get();
-    configObject.config.port = 5000;
-    configObject.config.test = true;
-    configObject.config.testingMultiple = !exerciseSlug;
 
     let hasFailed = false;
     let failedTestsCount = 0;
@@ -109,9 +63,9 @@ class TestCommand extends SessionCommand {
 
     const { config } = configObject;
 
-    const server = await createServer(configObject, this.configManager);
+    const server = await createServer(configObject, this.configManager, true);
 
-    socket.start(config, server);
+    socket.start(config, server, true);
 
     exercisesQueue.pop().test(this.config, config, socket);
   }

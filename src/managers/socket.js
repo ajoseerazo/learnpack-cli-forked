@@ -6,6 +6,7 @@ module.exports = {
   socket: null,
   config: null,
   allowedActions: null,
+  isTestingEnvironment: false,
   actionCallBacks: {
     clean: (data, s) => {
       s.logs = [];
@@ -29,8 +30,9 @@ module.exports = {
       (a) => !actions.includes(a)
     );
   },
-  start: function (config, server) {
+  start: function (config, server, isTestingEnvironment = false) {
     this.config = config;
+    this.isTestingEnvironment = isTestingEnvironment;
 
     // remove test action if grading is disabled
     this.allowedActions = config.actions.filter((act) =>
@@ -44,7 +46,7 @@ module.exports = {
         this.allowedActions
       );
 
-      if (!config.test) {
+      if (!this.isTestingEnvironment) {
         this.log("ready", ["Ready to compile or test..."]);
       }
 
@@ -152,7 +154,7 @@ module.exports = {
       else this.log(type + "-success", [stdout]);
     }
 
-    if (this.config.test) {
+    if (this.isTestingEnvironment) {
       this.onTestingFinised({
         result: "success",
       });
@@ -162,7 +164,7 @@ module.exports = {
     console.error("Socket error: " + type, stdout);
     this.log(type, [stdout]);
 
-    if (this.config.test) {
+    if (this.isTestingEnvironment) {
       this.onTestingFinised({
         result: "failed",
       });

@@ -5,7 +5,11 @@ const shell = require("shelljs");
 const addRoutes = require("./routes.js");
 const cli = require("cli-ux").default;
 
-module.exports = async function (configObj, configManager) {
+module.exports = async function (
+  configObj,
+  configManager,
+  isTestingEnvironment = false
+) {
   const { config } = configObj;
   var app = express();
   var server = require("http").Server(app);
@@ -20,8 +24,8 @@ module.exports = async function (configObj, configManager) {
   // add all needed endpoints
   await addRoutes(app, configObj, configManager);
 
-  server.listen(config.port, function () {
-    if (!config.test) {
+  server.listen(isTestingEnvironment ? 5000 : config.port, function () {
+    if (!isTestingEnvironment) {
       Console.success(
         `Exercises are running 😃 Open your browser to start practicing!`
       );
