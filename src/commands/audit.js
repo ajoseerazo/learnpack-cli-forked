@@ -45,7 +45,7 @@ class AuditCommand extends SessionCommand {
                     // Valdites all the relative path images.
                     for (const img in obj) {
                         // Validates if the image is in the assets folder.
-                        if (!fs.existsSync(`./.learn/assets/${obj[img].relUrl}`)) errors.push({ exercise: exercise, msg: `The file ${obj[img].relUrl} doesn't exist in the assets folder.` })
+                        if (!fs.existsSync(`${config.config.dirPath}/assets/${obj[img].relUrl}`)) errors.push({ exercise: exercise, msg: `The file ${obj[img].relUrl} doesn't exist in the assets folder.` })
                     }
                 } else if (finding === "external_images" && Object.keys(obj).length > 0) {
                     // Valdites all the aboslute path images.
@@ -112,12 +112,13 @@ class AuditCommand extends SessionCommand {
 
         // Check if all the exercises has the same ammount of README's, this way we can check if they have the same ammount of translations.
         let files = [];
-        Console.log(readmeFiles)
         readmeFiles.map((item, i, arr) => {
             if(item.count !== arr[0].count) files.push(` ${item.exercise}`)
         })
-        files.join()
-        warnings.push({exercise: null, msg: `These exercises are missing translations:${files}`})
+        if(files.length > 0){
+            files = files.join()
+            warnings.push({exercise: null, msg: `These exercises are missing translations: ${files}`})
+        }
 
         // Checks if the .gitignore file exists.
         if (!fs.existsSync(`.gitignore`)) warnings.push(".gitignore file doesn't exist")
