@@ -16,7 +16,7 @@ module.exports = {
     },
     findInFile: (types, content) => {
         const regex = {
-            relative_images: /!\[.*\]\s*\(((\.\/)?(\.{2}\/){1,5})(.*\/)*(.[^\/]*\.[a-zA-Z]{2,4})[^\s]*\)/gm,
+            relative_images: /!\[.*\]\s*\((((\.\/)?(\.{2}\/){1,5})(.*\/)*(.[^\/]*\.[a-zA-Z]{2,4})[^\s]*)\)/gm,
             external_images: /!\[.*\]\((https?:\/(\/{1}[^/)]+)+\/?)\)/gm,
             markdown_links: /(\s)+\[.*\]\((https?:\/(\/{1}[^/)]+)+\/?)\)/gm,
             url: /(https?:\/\/[a-zA-Z_\-.\/0-9]+)/gm,
@@ -51,7 +51,7 @@ module.exports = {
                     content: m[0],
                     absUrl: m[1],
                     mdUrl: m[2],
-                    relUrl: m[5]
+                    relUrl: m[6]
                 }
             }
         })

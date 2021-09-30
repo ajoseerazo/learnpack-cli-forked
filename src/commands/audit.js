@@ -5,6 +5,7 @@ const Console = require('../utils/console')
 const { isUrl, findInFile, showErrors, showWarnings } = require('../utils/audit')
 const SessionCommand = require('../utils/SessionCommand');
 const fm = require("front-matter")
+const path = require('path')
 
 class AuditCommand extends SessionCommand {
     async init() {
@@ -21,7 +22,7 @@ class AuditCommand extends SessionCommand {
 
         // Get configuration object.
         const config = this.configManager.get();
-        
+
         let errors = []
         let warnings = []
 
@@ -32,8 +33,13 @@ class AuditCommand extends SessionCommand {
             const frontmatter = fm(content).attributes
             for (const attribute in frontmatter) {
                 if (attribute === "intro" || attribute === "tutorial") {
-                    let res = await fetch(frontmatter[attribute], { method: "HEAD" });
-                    if (!res.ok) errors.push({ exercise: exercise, msg: `This link is broken (${res.ok}): ${frontmatter[attribute]}` })
+                    try {
+                        let res = await fetch(frontmatter[attribute], { method: "HEAD" });
+                        if (!res.ok) errors.push({ exercise: exercise.title, msg: `This link is broken (${res.ok}): ${frontmatter[attribute]}` })
+                    }
+                    catch (error) {
+                        errors.push({ exercise: exercise.title, msg: `This link is broken: ${frontmatter[attribute]}` })
+                    }
                 }
             }
 
@@ -45,19 +51,32 @@ class AuditCommand extends SessionCommand {
                     // Valdites all the relative path images.
                     for (const img in obj) {
                         // Validates if the image is in the assets folder.
-                        if (!fs.existsSync(`${config.config.dirPath}/assets/${obj[img].relUrl}`)) errors.push({ exercise: exercise, msg: `The file ${obj[img].relUrl} doesn't exist in the assets folder.` })
+                        let relativePath = path.relative(exercise.path.replace(/\\/gm, "/"),`${config.config.dirPath}/assets/${obj[img].relUrl}`).replace(/\\/gm, "/")
+                        if(relativePath != obj[img].absUrl && `${relativePath}?raw=true` != obj[img].absUrl ) {
+                            errors.push({ exercise: exercise.title, msg: `This relative path (${obj[img].relUrl}) is not pointing to the assets folder.` })
+                        }
+                        if(!fs.existsSync(`${config.config.dirPath}/assets/${obj[img].relUrl}`)) errors.push({ exercise: exercise.title, msg: `The file ${obj[img].relUrl} doesn't exist in the assets folder.` })
                     }
                 } else if (finding === "external_images" && Object.keys(obj).length > 0) {
                     // Valdites all the aboslute path images.
                     for (const img in obj) {
-                        let res = await fetch(obj[img].absUrl, { method: "HEAD" });
-                        if (!res.ok) errors.push({ exercise: exercise, msg: `This link is broken: ${obj[img].absUrl}` })
+                        try {
+                            let res = await fetch(obj[img].absUrl, { method: "HEAD" });
+                            if (!res.ok) errors.push({ exercise: exercise.title, msg: `This link is broken: ${obj[img].absUrl}` })
+                        }
+                        catch (error) {
+                            errors.push({ exercise: exercise.title, msg: `This link is broken: ${obj[img].absUrl}` })
+                        }
                     }
                 } else if (finding === "markdown_links" && Object.keys(obj).length > 0) {
-                    // This was working but linkCheck, stopped working
                     for (const link in obj) {
-                        let res = await fetch(obj[link].mdUrl, { method: "HEAD" });
-                        if (!res.ok) errors.push({ exercise: exercise, msg: `This link is broken: ${obj[link].mdUrl}` })
+                        try {
+                            let res = await fetch(obj[link].mdUrl, { method: "HEAD" });
+                            if (!res.ok) errors.push({ exercise: exercise.title, msg: `This link is broken: ${obj[link].mdUrl}` })
+                        }
+                        catch (error) {
+                            errors.push({ exercise: exercise.title, msg: `This link is broken: ${obj[link].mdUrl}` })
+                        }
                     }
                 }
             }
@@ -73,6 +92,7 @@ class AuditCommand extends SessionCommand {
             return false
         }
 
+        Console.info('Checking if the config file is fine...')
         // These two lines check if the 'slug' property is inside the configuration object.
         Console.debug("Checking if the slug property is inside the configuration object...")
         if (!config.slug) errors.push({ exercise: null, msg: "The slug property is not in the configuration object" })
@@ -91,16 +111,17 @@ class AuditCommand extends SessionCommand {
         let readmeFiles = []
 
         if (exercises.length > 0) {
+            Console.info('Checking if the images are working...')
             for (const index in exercises) {
                 let exercise = exercises[index]
-                let readmeFilesCount = {exercise: exercise.title,count: 0};
+                let readmeFilesCount = { exercise: exercise.title, count: 0 };
                 if (Object.keys(exercise.translations).length == 0) errors.push({ exercise: exercise.title, msg: `The exercise ${exercise.title} doesn't have a README.md file.` })
 
                 for (const lang in exercise.translations) {
                     let files = []
                     for (const file of exercise.files) {
-                        let found = await find(file, exercise.translations[lang], exercise.title)
-                        if (found == true) readmeFilesCount = {...readmeFilesCount, count: readmeFilesCount.count+1}
+                        let found = await find(file, exercise.translations[lang], exercise)
+                        if (found == true) readmeFilesCount = { ...readmeFilesCount, count: readmeFilesCount.count + 1 }
                         files.push(found)
                     }
                     if (!files.includes(true)) errors.push({ exercise: exercise.title, msg: `This exercise doesn't have a README.md file.` })
@@ -110,14 +131,15 @@ class AuditCommand extends SessionCommand {
             }
         } else errors.push({ exercise: null, msg: "The exercises array is empty." })
 
+        Console.info("Checking if important files are missing... (README's, translations, gitignore...)")
         // Check if all the exercises has the same ammount of README's, this way we can check if they have the same ammount of translations.
         let files = [];
         readmeFiles.map((item, i, arr) => {
-            if(item.count !== arr[0].count) files.push(` ${item.exercise}`)
+            if (item.count !== arr[0].count) files.push(` ${item.exercise}`)
         })
-        if(files.length > 0){
+        if (files.length > 0) {
             files = files.join()
-            warnings.push({exercise: null, msg: `These exercises are missing translations: ${files}`})
+            warnings.push({ exercise: null, msg: `These exercises are missing translations: ${files}` })
         }
 
         // Checks if the .gitignore file exists.
