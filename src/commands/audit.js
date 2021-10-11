@@ -52,7 +52,7 @@ class AuditCommand extends SessionCommand {
                     for (const img in obj) {
                         // Validates if the image is in the assets folder.
                         let relativePath = path.relative(exercise.path.replace(/\\/gm, "/"),`${config.config.dirPath}/assets/${obj[img].relUrl}`).replace(/\\/gm, "/")
-                        if(relativePath.split("?").shift() != obj[img].absUrl) {
+                        if(relativePath != obj[img].absUrl.split("?").shift()) {
                             errors.push({ exercise: exercise.title, msg: `This relative path (${obj[img].relUrl}) is not pointing to the assets folder.` })
                         }
                         if(!fs.existsSync(`${config.config.dirPath}/assets/${obj[img].relUrl}`)) errors.push({ exercise: exercise.title, msg: `The file ${obj[img].relUrl} doesn't exist in the assets folder.` })
