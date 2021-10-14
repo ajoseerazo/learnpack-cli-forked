@@ -2,7 +2,7 @@ const fs = require('fs')
 const fetch = require('node-fetch')
 const { flags } = require('@oclif/command')
 const Console = require('../utils/console')
-const { isUrl, findInFile, showErrors, showWarnings } = require('../utils/audit')
+const { isUrl, findInFile, checkForEmptySpaces, showErrors, showWarnings } = require('../utils/audit')
 const SessionCommand = require('../utils/SessionCommand');
 const fm = require("front-matter")
 const path = require('path')
@@ -25,19 +25,52 @@ class AuditCommand extends SessionCommand {
 
         let errors = []
         let warnings = []
+        let counter = {
+            images: {
+                error: 0,
+                total: 0,
+            },
+            links: {
+                error: 0,
+                total: 0,
+            },
+            exercises: 0,
+            readmeFiles: 0
+        }
+
+        // Check if the exercises folder has some files within any ./exercise
+        const exercisesPath = config.config.exercisesPath
+        fs.readdir(exercisesPath, (err, files) => {
+            if (err) {
+                return console.log('Unable to scan directory: ' + err);
+            }
+            //listing all files using forEach
+            files.forEach(function (file) {
+                // Do whatever you want to do with the file
+                let filePath = path.join(exercisesPath, file)
+                if (fs.statSync(filePath).isFile()) warnings.push({ exercise: file, msg: `This file is not inside any exercise folder.` })
+            });
+        })
 
         // This function checks that each of the url's are working.
         const checkUrl = async (file, exercise) => {
             if (!fs.existsSync(file.path)) return false
             const content = fs.readFileSync(file.path).toString();
+            let isEmpty = checkForEmptySpaces(content);
+            if (isEmpty === true || content == false) errors.push({ exercise: exercise.title, msg: `This file (${file.name}) doesn't have any content inside.` })
             const frontmatter = fm(content).attributes
             for (const attribute in frontmatter) {
                 if (attribute === "intro" || attribute === "tutorial") {
+                    counter.links.total++
                     try {
                         let res = await fetch(frontmatter[attribute], { method: "HEAD" });
-                        if (!res.ok) errors.push({ exercise: exercise.title, msg: `This link is broken (${res.ok}): ${frontmatter[attribute]}` })
+                        if (!res.ok) {
+                            counter.links.error++;
+                            errors.push({ exercise: exercise.title, msg: `This link is broken (${res.ok}): ${frontmatter[attribute]}` })
+                        }
                     }
                     catch (error) {
+                        counter.links.error++;
                         errors.push({ exercise: exercise.title, msg: `This link is broken: ${frontmatter[attribute]}` })
                     }
                 }
@@ -47,34 +80,49 @@ class AuditCommand extends SessionCommand {
             const findings = findInFile(["relative_images", "external_images", "markdown_links"], content);
             for (const finding in findings) {
                 let obj = findings[finding];
+                // Valdites all the relative path images.
                 if (finding === "relative_images" && Object.keys(obj).length > 0) {
-                    // Valdites all the relative path images.
                     for (const img in obj) {
                         // Validates if the image is in the assets folder.
-                        let relativePath = path.relative(exercise.path.replace(/\\/gm, "/"),`${config.config.dirPath}/assets/${obj[img].relUrl}`).replace(/\\/gm, "/")
-                        if(relativePath != obj[img].absUrl.split("?").shift()) {
+                        counter.images.total++
+                        let relativePath = path.relative(exercise.path.replace(/\\/gm, "/"), `${config.config.dirPath}/assets/${obj[img].relUrl}`).replace(/\\/gm, "/")
+                        if (relativePath != obj[img].absUrl.split("?").shift()) {
+                            counter.images.error++;
                             errors.push({ exercise: exercise.title, msg: `This relative path (${obj[img].relUrl}) is not pointing to the assets folder.` })
                         }
-                        if(!fs.existsSync(`${config.config.dirPath}/assets/${obj[img].relUrl}`)) errors.push({ exercise: exercise.title, msg: `The file ${obj[img].relUrl} doesn't exist in the assets folder.` })
+                        if (!fs.existsSync(`${config.config.dirPath}/assets/${obj[img].relUrl}`)) {
+                            counter.images.error++;
+                            errors.push({ exercise: exercise.title, msg: `The file ${obj[img].relUrl} doesn't exist in the assets folder.` })
+                        }
                     }
                 } else if (finding === "external_images" && Object.keys(obj).length > 0) {
                     // Valdites all the aboslute path images.
                     for (const img in obj) {
+                        counter.images.total++
                         try {
                             let res = await fetch(obj[img].absUrl, { method: "HEAD" });
-                            if (!res.ok) errors.push({ exercise: exercise.title, msg: `This link is broken: ${obj[img].absUrl}` })
+                            if (!res.ok) {
+                                counter.images.error++;
+                                errors.push({ exercise: exercise.title, msg: `This link is broken: ${obj[img].absUrl}` })
+                            }
                         }
                         catch (error) {
+                            counter.images.error++;
                             errors.push({ exercise: exercise.title, msg: `This link is broken: ${obj[img].absUrl}` })
                         }
                     }
                 } else if (finding === "markdown_links" && Object.keys(obj).length > 0) {
                     for (const link in obj) {
+                        counter.links.total++
                         try {
                             let res = await fetch(obj[link].mdUrl, { method: "HEAD" });
-                            if (!res.ok) errors.push({ exercise: exercise.title, msg: `This link is broken: ${obj[link].mdUrl}` })
+                            if (!res.ok) {
+                                counter.links.error++;
+                                errors.push({ exercise: exercise.title, msg: `This link is broken: ${obj[link].mdUrl}` })
+                            }
                         }
                         catch (error) {
+                            counter.links.error++;
                             errors.push({ exercise: exercise.title, msg: `This link is broken: ${obj[link].mdUrl}` })
                         }
                     }
@@ -92,7 +140,7 @@ class AuditCommand extends SessionCommand {
             return false
         }
 
-        Console.info('Checking if the config file is fine...')
+        Console.info(' Checking if the config file is fine...')
         // These two lines check if the 'slug' property is inside the configuration object.
         Console.debug("Checking if the slug property is inside the configuration object...")
         if (!config.slug) errors.push({ exercise: null, msg: "The slug property is not in the configuration object" })
@@ -100,22 +148,43 @@ class AuditCommand extends SessionCommand {
         // These two lines check if the 'repository' property is inside the configuration object.
         Console.debug("Checking if the repository property is inside the configuration object...")
         if (!config.repository) errors.push({ exercise: null, msg: "The repository property is not in the configuration object" })
-        else isUrl(config.repository, errors)
+        else isUrl(config.repository, errors, counter)
 
         // These two lines check if the 'description' property is inside the configuration object.
         Console.debug("Checking if the description property is inside the configuration object...")
         if (!config.description) errors.push({ exercise: null, msg: "The description property is not in the configuration object" })
 
+        if (errors.length == 0) Console.log("The config file is ok")
+
         // Validates if images and links are working at every README file.
-        let exercises = config.exercises
+        const exercises = config.exercises
         let readmeFiles = []
 
         if (exercises.length > 0) {
-            Console.info('Checking if the images are working...')
+            Console.info(' Checking if the images are working...')
             for (const index in exercises) {
                 let exercise = exercises[index]
                 let readmeFilesCount = { exercise: exercise.title, count: 0 };
                 if (Object.keys(exercise.translations).length == 0) errors.push({ exercise: exercise.title, msg: `The exercise ${exercise.title} doesn't have a README.md file.` })
+
+                if (exercise.language == "python3" || exercise.language == "python") {
+                    exercise.files.map(f => f).find(f => {
+                        if (f.path.includes('test.py') || f.path.includes('tests.py')) {
+                            const content = fs.readFileSync(f.path).toString();
+                            let isEmpty = checkForEmptySpaces(content);
+                            if (isEmpty === true || content == false) errors.push({ exercise: exercise.title, msg: `This file (${f.name}) doesn't have any content inside.` })
+                        }
+                    });
+                }
+                else {
+                    exercise.files.map(f => f).find(f => {
+                        if (f.path.includes('test.js') || f.path.includes('tests.js')) {
+                            const content = fs.readFileSync(f.path).toString();
+                            let isEmpty = checkForEmptySpaces(content);
+                            if (isEmpty === true || content == false) errors.push({ exercise: exercise.title, msg: `This file (${f.name}) doesn't have any content inside.` })
+                        }
+                    });
+                }
 
                 for (const lang in exercise.translations) {
                     let files = []
@@ -131,7 +200,9 @@ class AuditCommand extends SessionCommand {
             }
         } else errors.push({ exercise: null, msg: "The exercises array is empty." })
 
-        Console.info("Checking if important files are missing... (README's, translations, gitignore...)")
+        Console.log(`${counter.images.total - counter.images.error} images ok from ${counter.images.total}`)
+
+        Console.info(" Checking if important files are missing... (README's, translations, gitignore...)")
         // Check if all the exercises has the same ammount of README's, this way we can check if they have the same ammount of translations.
         let files = [];
         readmeFiles.map((item, i, arr) => {
@@ -145,8 +216,13 @@ class AuditCommand extends SessionCommand {
         // Checks if the .gitignore file exists.
         if (!fs.existsSync(`.gitignore`)) warnings.push(".gitignore file doesn't exist")
 
+        counter.exercises = exercises.length;
+        readmeFiles.forEach((readme) => {
+            counter.readmeFiles += readme.count
+        })
+
         await showWarnings(warnings)
-        await showErrors(errors)
+        await showErrors(errors, counter)
     }
 }
 
