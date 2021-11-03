@@ -98,7 +98,7 @@ class StartCommand extends SessionCommand {
 
     socket.on("test", async (data) => {
         const exercise = this.configManager.getExercise(data.exerciseSlug)
-        console.log("exercise", exercise)
+
         if(!exercise.language){
           socket.error('compiler-error','Impossible to detect engine language for testing for '+data.exerciseSlug+'...')
           return;

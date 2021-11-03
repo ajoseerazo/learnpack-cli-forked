@@ -69,7 +69,7 @@ const publish = async (config) => {
   let payload = {}
   keys.forEach(k => config[k] ? payload[k] = config[k] : null);
   try{
-    console.log("Package to publish: ", payload)
+    Console.log("Package to publish: ", payload)
     cli.action.start('Updating package information...')
     await cli.wait(1000)
     const data = await fetch(`${HOST}/v1/package/${config.slug}`,{
@@ -80,7 +80,7 @@ const publish = async (config) => {
     return data
   }
   catch(err){
-    console.log("payload", payload)
+    Console.log("payload", payload)
     Console.error(err.message);
     Console.debug(err);
     throw err;
