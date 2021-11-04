@@ -1,5 +1,6 @@
 const fs = require('fs')
 const fetch = require('node-fetch')
+const {validateExerciseDirectoryName} = require('../managers/config/exercise.js')
 const { flags } = require('@oclif/command')
 const Console = require('../utils/console')
 const { isUrl, findInFile, checkForEmptySpaces, showErrors, showWarnings } = require('../utils/audit')
@@ -164,6 +165,7 @@ class AuditCommand extends SessionCommand {
             Console.info(' Checking if the images are working...')
             for (const index in exercises) {
                 let exercise = exercises[index]
+                if (!validateExerciseDirectoryName(exercise.title)) errors.push({exercise: exercise.title, msg: `The exercise ${exercise.title} has an invalid name.`})
                 let readmeFilesCount = { exercise: exercise.title, count: 0 };
                 if (Object.keys(exercise.translations).length == 0) errors.push({ exercise: exercise.title, msg: `The exercise ${exercise.title} doesn't have a README.md file.` })
 
