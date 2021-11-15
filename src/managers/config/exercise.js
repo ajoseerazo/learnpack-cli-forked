@@ -3,6 +3,7 @@ const frontMatter = require('front-matter')
 const fs = require("fs")
 let Console = require('../../utils/console');
 const allowed = require('./allowed_files')
+const { ValidationError } = require('../../utils/errors.js')
 
 const exercise = (path, position, configObject) => {
 
@@ -12,7 +13,7 @@ const exercise = (path, position, configObject) => {
     if(!validateExerciseDirectoryName(slug)){
         Console.error('Exercise directory "'+slug+'" has an invalid name, it has to start with two or three digits followed by words separated by underscors or hyphen (no white spaces). e.g: 01.12-hello-world')
         Console.help('Verify that the folder "'+slug+'" starts with a number and it does not contain white spaces or weird characters.')
-        throw Error('Error building the exercise index')
+        throw ValidationError(`This exercise has a invalid name: ${slug}`)
     }
     
     // get all the files
@@ -93,8 +94,8 @@ const exercise = (path, position, configObject) => {
 }
 
 const validateExerciseDirectoryName = (str) => {
-    if(str = "./") return true;
-    const regex = /^\d{2,3}(?:\.\d{1,2}?)?-[a-zA-z](?:-|_?[0-9a-zA-z]*)*$/
+    if(str == "./") return true;
+    const regex = /^(\d{2,3}(\.\d{1,2})?-([A-Za-z0-9]{2,}(-|_)?)+)$/
     return regex.test(str)
 }
 
@@ -206,5 +207,6 @@ const filterFiles = (files, basePath=".") => files.map(ex => ({
 module.exports = {
     exercise,
     detect,
-    filterFiles
+    filterFiles,
+    validateExerciseDirectoryName
 }
