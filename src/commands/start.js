@@ -50,13 +50,8 @@ class StartCommand extends SessionCommand {
     socket.on("open", (data) => {
       Console.debug("Opening these files: ", data)
       
-      console.log(data.files);
-
       let files = prioritizeHTMLFile(data.files);
-
-      console.log(files);
-
-
+      
       dispatcher.enqueue(dispatcher.events.OPEN_FILES, files);
       socket.ready('Ready to compile...')
     })
