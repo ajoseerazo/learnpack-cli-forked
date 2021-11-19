@@ -7,7 +7,8 @@
     "max-params": "off",
     "unicorn/prefer-node-protocol": "off",
     "nonblock-statement-body-position": ["error", "below"],
-    "no-negated-condition": "off"
+    "no-negated-condition": "off",
+    "prefer-promise-reject-errors": "off"
   },
   "extends": [
     "oclif", 

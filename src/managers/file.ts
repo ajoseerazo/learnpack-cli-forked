@@ -7,7 +7,7 @@ import Console from '../utils/console'
 import * as https from 'https'
 import fetch from 'node-fetch'
 
-const decompress = (sourcePath: any, destinationPath: any) =>
+export const decompress = (sourcePath: any, destinationPath: any) =>
   new Promise((resolve, reject) => {
     Console.debug('Decompressing ' + sourcePath)
     targz.decompress(
@@ -27,7 +27,7 @@ const decompress = (sourcePath: any, destinationPath: any) =>
     )
   })
 
-const downloadEditor = async (version: any, destination: any) => {
+export const downloadEditor = async (version: any, destination: any) => {
   // https://raw.githubusercontent.com/learnpack/coding-ide/master/dist/app.tar.gz
   // if(versions[version] === undefined) throw new Error(`Invalid editor version ${version}`)
   const resp2 = await fetch(
@@ -47,7 +47,7 @@ const downloadEditor = async (version: any, destination: any) => {
   )
 }
 
-const download = (url: any, dest: any) => {
+export const download = (url: any, dest: any) => {
   Console.debug('Downloading ' + url)
   return new Promise((resolve, reject) => {
     const request = https.get(url, response => {
@@ -92,7 +92,7 @@ const download = (url: any, dest: any) => {
   })
 }
 
-const clone = (repository = '', folder = './') =>
+export const clone = (repository = '', folder = './') =>
   new Promise((resolve, reject) => {
     if (!repository) {
       reject('Missing repository url for this package')
@@ -138,7 +138,7 @@ const clone = (repository = '', folder = './') =>
     resolve('Done')
   })
 
-const rmSync = function (path: string) {
+export const rmSync = function (path: string) {
   let files = []
   if (fs.existsSync(path)) {
     files = fs.readdirSync(path)
