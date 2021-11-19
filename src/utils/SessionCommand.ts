@@ -6,23 +6,25 @@ import configManager from '../managers/config/index.js'
 import {AuthError} from './errors.js'
 
 export default class SessionCommand extends BaseCommand {
-  session = null
-  configManager = null
+  session: any = null
+  configManager: any = null
 
-  constructor(...args) {
-    super(...args)
+  constructor(args: any) {
+    super(args)
     this.configManager = null
     this.session = null
   }
 
   async initSession(flags: any, _private: any) {
     try {
-      if (!this.configManager) await this.buildConfig(flags)
+      if (!this.configManager) {
+        await this.buildConfig(flags)
+      }
 
-      this.session = await SessionManager.get(this.configManager.get())
-      if (this.session)
+      this.session = await SessionManager.get(this.configManager?.get())
+      if (this.session) {
         Console.debug(`Session open for ${this.session.payload.email}.`)
-      else {
+      } else {
         if (_private)
           throw new AuthError(
             'You need to log in, run the following command to continue: $ learnpack login',
@@ -30,7 +32,7 @@ export default class SessionCommand extends BaseCommand {
         Console.debug('No active session available', _private)
       }
     } catch (error) {
-      Console.error(error.message)
+      Console.error((error as any).message)
     }
   }
 
