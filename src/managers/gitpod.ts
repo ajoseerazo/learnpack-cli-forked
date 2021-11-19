@@ -3,14 +3,15 @@ import * as shell from 'shelljs'
 import socket from './socket'
 import * as fs from 'fs'
 
-import {File} from '../models/gitpod-data'
+import {TFile, IGitpod} from '../models/gitpod-data'
+import {IConfig} from '../models/config'
 
-const Gitpod = {
+const Gitpod: IGitpod = {
   socket: null,
   config: null,
   initialized: false,
   hasGPCommand: false,
-  init: function (config: any = null) {
+  init: function (config?: IConfig) {
     if (this.initialized) {
       return
     }
@@ -32,12 +33,12 @@ const Gitpod = {
       Console.debug('Gitpod command line tool not found')
     }
   },
-  openFiles: async function (files: Array<File>) {
+  openFiles: async function (files: Array<TFile>) {
     Console.debug('Attempting to open files in gitpod mode', files)
     this.init() // initilize gitpod config
 
     // gitpod will open files only on isolated mode
-    if (!this.config || (this.config as any).grading !== 'isolated') {
+    if (!this.config || this.config.grading !== 'isolated') {
       Console.debug(
         'Files cannot be automatically opened because we are not on isolated grading (only for isolated)',
       )
@@ -54,7 +55,7 @@ const Gitpod = {
 
     socket.log('ready', ['Ready to compile or test...'])
   },
-  setup(config: any) {
+  setup(config?: IConfig) {
     this.init(config) // initilize gitpod config
     this.autosave('on')
   },

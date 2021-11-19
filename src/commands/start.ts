@@ -8,7 +8,8 @@ import {decompress, downloadEditor} from '../managers/file'
 
 import createServer from '../managers/server'
 
-import {GitpodData} from '../models/gitpod-data'
+import {IGitpodData} from '../models/gitpod-data'
+import {IExercise} from '../models/exercise'
 
 /* import {
   ValidationError,
@@ -17,6 +18,8 @@ import {GitpodData} from '../models/gitpod-data'
 } from "../utils/errors.js"; */
 
 export default class StartCommand extends SessionCommand {
+  static description: string
+  static flags: any
   // 🛑 IMPORTANT
   // Every command that will use the configManager needs this init method
   async init() {
@@ -53,19 +56,19 @@ export default class StartCommand extends SessionCommand {
     // listen to socket commands
     socket.start(config, server)
 
-    socket.on('gitpod-open', (data: GitpodData) => {
+    socket.on('gitpod-open', (data: IGitpodData) => {
       Console.debug('Opening these files on gitpod: ', data)
       Gitpod.openFiles(data.files)
     })
 
-    socket.on('reset', (exercise: any) => {
+    socket.on('reset', (exercise: IExercise) => {
       try {
         this.configManager.reset(exercise.exerciseSlug)
         socket.ready('Ready to compile...')
-      } catch (error) {
+      } catch (error: any) {
         socket.error(
           'compiler-error',
-          (error as any).message || 'There was an error reseting the exercise',
+          error.message || 'There was an error reseting the exercise',
         )
         setTimeout(() => socket.ready('Ready to compile...'), 2000)
       }
@@ -76,7 +79,7 @@ export default class StartCommand extends SessionCommand {
     //   socket.log('ready',['Ready to compile...'])
     // })
 
-    socket.on('build', async (data: any) => {
+    socket.on('build', async (data: IExercise) => {
       const exercise = this.configManager.getExercise(data.exerciseSlug)
 
       if (!exercise.language) {
@@ -105,7 +108,7 @@ export default class StartCommand extends SessionCommand {
       })
     })
 
-    socket.on('test', async (data: any) => {
+    socket.on('test', async (data: IExercise) => {
       const exercise = this.configManager.getExercise(data.exerciseSlug)
 
       if (!exercise.language) {
@@ -141,7 +144,7 @@ export default class StartCommand extends SessionCommand {
 
     // start watching for file changes
     if ((flags as any).watch)
-      this.configManager.watchIndex((_exercises: any) =>
+      this.configManager.watchIndex((_exercises: Array<IExercise>) =>
         socket.reload(null, _exercises),
       )
   }
