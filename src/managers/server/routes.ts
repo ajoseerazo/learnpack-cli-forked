@@ -9,7 +9,7 @@ import {detect, filterFiles} from '../config/exercise'
 const withHandler = (func: any) => (req: any, res: any) => {
   try {
     func(req, res)
-  } catch (error) {
+  } catch (error: any) {
     Console.debug(error)
     const _err = {
       message: error.message || 'There has been an error',
@@ -32,14 +32,14 @@ export default async function (
   const {config, exercises} = configObject
   app.get(
     '/config',
-    withHandler((_, res) => {
+    withHandler((_: any, res: any) => {
       res.json(configObject)
     }),
   )
 
   app.get(
     '/exercise',
-    withHandler((_, res) => {
+    withHandler((_: any, res: any) => {
       res.json(exercises)
     }),
   )
@@ -79,7 +79,7 @@ export default async function (
 
         // update the file hierarchy with updates
         exercise.files = [
-          ...exercise.files.filter(f => f.name.includes('test.')),
+          ...exercise.files.filter((f: any) => f.name.includes('test.')),
           ...filterFiles(scanedFiles),
         ]
         Console.debug('Exercise updated files: ', exercise.files)
@@ -111,7 +111,7 @@ export default async function (
 
       if (
         exercise.files.filter(
-          f =>
+          (f: any) =>
             !f.name.toLowerCase().includes('readme.') &&
             !f.name.toLowerCase().includes('test.'),
         ).length === 0
@@ -129,7 +129,7 @@ export default async function (
 
   app.get(
     '/exercise/:slug/file/:fileName',
-    withHandler((req, res) => {
+    withHandler((req: any, res: any) => {
       res.write(
         configManager.getExercise(req.params.slug).getFile(req.params.fileName),
       )
@@ -141,7 +141,7 @@ export default async function (
   app.put(
     '/exercise/:slug/file/:fileName',
     textBodyParser,
-    withHandler((req, res) => {
+    withHandler((req: any, res: any) => {
       // const result =
       configManager
       .getExercise(req.params.slug)

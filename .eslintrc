@@ -5,7 +5,9 @@
     "@typescript-eslint/no-explicit-any": "off",
     "unicorn/filename-case": "off",
     "max-params": "off",
-    "unicorn/prefer-node-protocol": "off"
+    "unicorn/prefer-node-protocol": "off",
+    "nonblock-statement-body-position": ["error", "below"],
+    "no-negated-condition": "off"
   },
   "extends": [
     "oclif", 
