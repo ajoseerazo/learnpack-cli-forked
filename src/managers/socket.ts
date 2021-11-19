@@ -14,56 +14,63 @@ export default {
     if (!Array.isArray(actions)) actions = [actions]
 
     // avoid adding the "test" action if grading is disabled
-    if (actions.includes('test') && this.config.disable_grading)
-      actions = actions.filter(a => a !== 'test')
+    if (
+      actions.includes('test') &&
+      this.config &&
+      (this.config as any).disable_grading
+    )
+      actions = actions.filter((a: any) => a !== 'test')
 
     // remove duplicates
     /* this.allowedActions = this.allowedActions
       .filter((a) => !actions.includes(a))
       .concat(actions); */
     this.allowedActions = [
-      ...this.allowedActions.filter(a => !actions.includes(a)),
+      ...(this.allowedActions || []).filter(a => !actions.includes(a)),
       ...actions,
-    ]
+    ] as any
   },
   removeAllowed: function (actions: any) {
     if (!Array.isArray(actions)) actions = [actions]
-    this.allowedActions = this.allowedActions.filter(
+    this.allowedActions = (this.allowedActions || []).filter(
       a => !actions.includes(a),
-    )
+    ) as any
   },
-  start: function (config, server) {
+  start: function (config: any, server: any) {
     this.config = config
 
     // remove test action if grading is disabled
-    this.allowedActions = config.actions.filter(act =>
+    this.allowedActions = config.actions.filter((act: any) =>
       config.disable_grading ? act !== 'test' : true,
     )
 
     this.socket = connect(server)
-    this.socket.on('connection', socket => {
-      Console.debug(
-        'Connection with client successfully established',
-        this.allowedActions,
-      )
-      this.log('ready', ['Ready to compile or test...'])
 
-      socket.on('compiler', ({action, data}) => {
-        this.emit('clean', 'pending', ['Working...'])
+    if (this.socket) {
+      this.socket.on('connection', (socket: any) => {
+        Console.debug(
+          'Connection with client successfully established',
+          this.allowedActions,
+        )
+        this.log('ready', ['Ready to compile or test...'])
 
-        if (typeof data.exerciseSlug === 'undefined') {
-          this.log('internal-error', ['No exercise slug specified'])
-          Console.error('No exercise slug especified')
-          return
-        }
+        socket.on('compiler', ({action, data}: any) => {
+          this.emit('clean', 'pending', ['Working...'])
 
-        if (typeof this.actionCallBacks[action] === 'function')
-          this.actionCallBacks[action](data)
-        else this.log('internal-error', ['Uknown action ' + action])
+          if (typeof data.exerciseSlug === 'undefined') {
+            this.log('internal-error', ['No exercise slug specified'])
+            Console.error('No exercise slug especified')
+            return
+          }
+
+          if (typeof this.actionCallBacks[action] === 'function')
+            this.actionCallBacks[action](data)
+          else this.log('internal-error', ['Uknown action ' + action])
+        })
       })
-    })
+    }
   },
-  on: function (action, callBack) {
+  on: function (action: any, callBack: any) {
     this.actionCallBacks[action] = callBack
   },
   clean: function (_ = 'pending', logs = []) {
@@ -106,7 +113,7 @@ export default {
       this.removeAllowed('reset')
     }
 
-    this.socket.emit('compiler', {
+    this.socket?.emit('compiler', {
       action,
       status,
       logs,
@@ -117,10 +124,10 @@ export default {
     })
   },
 
-  ready: function (message) {
+  ready: function (message: any) {
     this.log('ready', [message])
   },
-  success: function (type, stdout = '') {
+  success: function (type: any, stdout: string) {
     const types = ['compiler', 'testing']
     if (!types.includes(type))
       this.fatal(`Invalid socket success type "${type}" on socket`)
@@ -128,11 +135,11 @@ export default {
       this.log(type + '-success', ['No stdout to display on the console'])
     else this.log(type + '-success', [stdout])
   },
-  error: function (type, stdout) {
+  error: function (type: any, stdout: any) {
     console.error('Socket error: ' + type, stdout)
     this.log(type, [stdout])
   },
-  fatal: function (msg) {
+  fatal: function (msg: string) {
     this.log('internal-error', [msg])
     throw msg
   },
