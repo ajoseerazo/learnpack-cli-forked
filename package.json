@@ -20,6 +20,7 @@
     "debounce": "^1.2.0",
     "dotenv": "^8.2.0",
     "enquirer": "^2.3.6",
+    "eslint-plugin-unicorn": "^38.0.1",
     "eta": "^1.2.0",
     "express": "^4.17.1",
     "front-matter": "^4.0.2",
@@ -32,17 +33,29 @@
     "shelljs": "^0.8.4",
     "socket.io": "^2.3.0",
     "targz": "^1.0.1",
+    "tslib": "^1",
     "validator": "^13.1.1"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",
     "@oclif/test": "^1.2.6",
+    "@types/chai": "^4",
+    "@types/mocha": "^5",
+    "@types/node": "^10",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
     "chai": "^4.2.0",
-    "eslint": "^5.16.0",
-    "eslint-config-oclif": "^3.1.0",
+    "eslint": "^8.2.0",
+    "eslint-config-oclif": "^4.0",
+    "eslint-config-oclif-typescript": "^1.0.2",
     "globby": "^10.0.2",
+    "husky": ">=6",
+    "lint-staged": ">=10",
     "mocha": "^5.2.0",
-    "nyc": "^14.1.1"
+    "nyc": "^14.1.1",
+    "prettier": "^2.4.1",
+    "ts-node": "^8",
+    "typescript": "^3.3"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -70,10 +83,15 @@
   },
   "repository": "learnpack/learnpack-cli",
   "scripts": {
-    "postpack": "rm -f oclif.manifest.json",
+    "postpack": "rm -f oclif.manifest.json && eslint . --ext .ts --config .eslintrc",
     "posttest": "eslint .",
-    "prepack": "oclif-dev manifest && oclif-dev readme",
-    "test": "nyc mocha --forbid-only \"test/**/*.test.js\"",
-    "version": "oclif-dev readme && git add README.md"
+    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
+    "version": "oclif-dev readme && git add README.md",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --cache --fix",
+    "*.{js,css,md,ts}": "prettier --write"
   }
 }

@@ -8,3 +8,12 @@ node_modules
 /temp
 
 .env
+
+bin/.gitignore
+bin/.gitpod.dockerfile
+bin/.gitpod.yml
+bin/.learn/
+bin/README.md
+bin/exercises/
+bin/learn.json
+bin/preview.png
