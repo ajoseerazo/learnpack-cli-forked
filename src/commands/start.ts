@@ -2,8 +2,8 @@
 import {flags} from '@oclif/command'
 import SessionCommand from '../utils/SessionCommand'
 import Console from '../utils/console'
-import socket from '../managers/socket.js'
-import Gitpod from '../managers/gitpod.js'
+import socket from '../managers/socket'
+import Gitpod from '../managers/gitpod'
 import {decompress, downloadEditor} from '../managers/file.js'
 
 import createServer from '../managers/server'
@@ -145,7 +145,8 @@ export default class StartCommand extends SessionCommand {
   }
 }
 
-StartCommand.description = 'Runs a small server with all the exercise instructions'
+StartCommand.description =
+  'Runs a small server with all the exercise instructions'
 
 StartCommand.flags = {
   ...SessionCommand.flags,
