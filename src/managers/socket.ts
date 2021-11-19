@@ -47,7 +47,7 @@ export default {
     this.socket = connect(server)
 
     if (this.socket) {
-      this.socket.on('connection', (socket: any) => {
+      (this.socket as any).on('connection', (socket: any) => {
         Console.debug(
           'Connection with client successfully established',
           this.allowedActions,
@@ -63,15 +63,22 @@ export default {
             return
           }
 
-          if (typeof this.actionCallBacks[action] === 'function')
-            this.actionCallBacks[action](data)
-          else this.log('internal-error', ['Uknown action ' + action])
+          if (
+            this.actionCallBacks &&
+            typeof (this.actionCallBacks as any)[action] === 'function'
+          ) {
+            (this.actionCallBacks as any)[action](data)
+          } else {
+            this.log('internal-error', ['Uknown action ' + action])
+          }
         })
       })
     }
   },
   on: function (action: any, callBack: any) {
-    this.actionCallBacks[action] = callBack
+    if (this.actionCallBacks) {
+      (this.actionCallBacks as any)[action] = callBack
+    }
   },
   clean: function (_ = 'pending', logs = []) {
     this.emit('clean', 'pending', logs)
@@ -79,28 +86,33 @@ export default {
   ask: function (questions = []) {
     return new Promise((resolve, _) => {
       this.emit('ask', 'pending', ['Waiting for input...'], questions)
-      this.on('input', ({inputs}) => resolve(inputs))
+      this.on('input', ({inputs}: any) => resolve(inputs))
     })
   },
   reload: function (files = null, exercises = null) {
     this.emit('reload', files, exercises)
   },
 
-  log: function (status, messages = [], report = [], data = null) {
+  log: function (
+    status: any,
+    messages: any = [],
+    report: any = [],
+    data: any = null,
+  ) {
     this.emit('log', status, messages, [], report, data)
     Console.log(messages)
   },
   emit: function (
-    action,
-    status = 'ready',
-    logs = [],
-    inputs = [],
-    report = [],
-    data = null,
+    action: any,
+    status: any = 'ready',
+    logs: any = [],
+    inputs: any = [],
+    report: any = [],
+    data: any = null,
   ) {
     if (
       ['webpack', 'vanillajs', 'vue', 'react', 'css', 'html'].includes(
-        this.config.compiler,
+        (this.config as any)?.compiler,
       )
     ) {
       if (['compiler-success', 'compiler-warning'].includes(status))
@@ -109,11 +121,11 @@ export default {
         this.removeAllowed('preview')
     }
 
-    if (this.config.grading === 'incremental') {
+    if ((this.config as any)?.grading === 'incremental') {
       this.removeAllowed('reset')
     }
 
-    this.socket?.emit('compiler', {
+    (this.socket as any)?.emit('compiler', {
       action,
       status,
       logs,
