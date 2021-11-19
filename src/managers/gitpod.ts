@@ -3,7 +3,9 @@ import * as shell from 'shelljs'
 import socket from './socket'
 import * as fs from 'fs'
 
-export default {
+import {File} from '../models/gitpod-data'
+
+const Gitpod = {
   socket: null,
   config: null,
   initialized: false,
@@ -30,7 +32,7 @@ export default {
       Console.debug('Gitpod command line tool not found')
     }
   },
-  openFile: async function (files: any) {
+  openFiles: async function (files: Array<File>) {
     Console.debug('Attempting to open files in gitpod mode', files)
     this.init() // initilize gitpod config
 
@@ -60,7 +62,8 @@ export default {
     this.init() // initilize gitpod config
 
     if (this.hasGPCommand) {
-      if (!fs.existsSync('./.theia')) fs.mkdirSync('./.theia')
+      if (!fs.existsSync('./.theia'))
+        fs.mkdirSync('./.theia')
       if (!fs.existsSync('./.theia/settings.json')) {
         fs.writeFileSync(
           './.theia/settings.json',
@@ -76,3 +79,5 @@ export default {
     }
   },
 }
+
+export default Gitpod

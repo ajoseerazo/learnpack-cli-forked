@@ -8,6 +8,8 @@ import {decompress, downloadEditor} from '../managers/file'
 
 import createServer from '../managers/server'
 
+import {GitpodData} from '../models/gitpod-data'
+
 /* import {
   ValidationError,
   InternalError,
@@ -51,9 +53,9 @@ export default class StartCommand extends SessionCommand {
     // listen to socket commands
     socket.start(config, server)
 
-    socket.on('gitpod-open', (data: any) => {
+    socket.on('gitpod-open', (data: GitpodData) => {
       Console.debug('Opening these files on gitpod: ', data)
-      Gitpod.openFile(data.files)
+      Gitpod.openFiles(data.files)
     })
 
     socket.on('reset', (exercise: any) => {
