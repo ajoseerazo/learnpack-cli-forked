@@ -4,7 +4,7 @@ import SessionCommand from '../utils/SessionCommand'
 import Console from '../utils/console'
 import socket from '../managers/socket'
 import Gitpod from '../managers/gitpod'
-import {decompress, downloadEditor} from '../managers/file.js'
+import {decompress, downloadEditor} from '../managers/file'
 
 import createServer from '../managers/server'
 
