@@ -7,7 +7,8 @@ export default {
   socket: null,
   config: null,
   initialized: false,
-  init: function (config = null) {
+  hasGPCommand: false,
+  init: function (config: any = null) {
     if (this.initialized) {
       return
     }
@@ -20,9 +21,11 @@ export default {
 
     if (shell.exec('gp -h', {silent: true}).code === 0) {
       this.hasGPCommand = true
-      config.address = shell
-      .exec('gp url', {silent: true})
-      .stdout.replace(/(\r\n|\n|\r)/gm, '')
+      if (config) {
+        config.address = shell
+        .exec('gp url', {silent: true})
+        .stdout.replace(/(\r\n|\n|\r)/gm, '')
+      }
     } else {
       Console.debug('Gitpod command line tool not found')
     }
@@ -32,7 +35,7 @@ export default {
     this.init() // initilize gitpod config
 
     // gitpod will open files only on isolated mode
-    if (!this.config || this.config.grading !== 'isolated') {
+    if (!this.config || (this.config as any).grading !== 'isolated') {
       Console.debug(
         'Files cannot be automatically opened because we are not on isolated grading (only for isolated)',
       )
@@ -49,7 +52,7 @@ export default {
 
     socket.log('ready', ['Ready to compile or test...'])
   },
-  setup(config) {
+  setup(config: any) {
     this.init(config) // initilize gitpod config
     this.autosave('on')
   },
