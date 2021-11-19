@@ -8,11 +8,15 @@ export default {
   config: null,
   initialized: false,
   init: function (config = null) {
-    if (this.initialized) return
+    if (this.initialized) {
+      return
+    }
 
     this.initialized = true
 
-    if (config) this.config = config
+    if (config) {
+      this.config = config
+    }
 
     if (shell.exec('gp -h', {silent: true}).code === 0) {
       this.hasGPCommand = true
