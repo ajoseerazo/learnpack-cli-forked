@@ -4,6 +4,7 @@ import {validURL} from '../../../src/utils/validators'
 
 const EXAMPLE_URL = 'https://example.com'
 const GITHUB_URL = 'https://github.com'
+
 const INVALID_URL = 'WHATEVER'
 
 describe('validURL', () => {
