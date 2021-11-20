@@ -15,7 +15,10 @@
     "unicorn/no-array-callback-reference": "off",
     "new-cap": "off",
     "unicorn/throw-new-error": "off",
-    "unicorn/import-style": "off"
+    "unicorn/import-style": "off",
+    "complexity": "off",
+    "@typescript-eslint/no-var-requires": "warning",
+    "unicorn/no-abusive-eslint-disable": "off"
   },
   "extends": [
     "oclif", 
