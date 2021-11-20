@@ -17,7 +17,7 @@
     "unicorn/throw-new-error": "off",
     "unicorn/import-style": "off",
     "complexity": "off",
-    "@typescript-eslint/no-var-requires": "warning",
+    // "@typescript-eslint/no-var-requires": "warning",
     "unicorn/no-abusive-eslint-disable": "off"
   },
   "extends": [

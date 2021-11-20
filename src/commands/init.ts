@@ -1,16 +1,16 @@
 import {flags} from '@oclif/command'
 import BaseCommand from '../utils/BaseCommand'
 
-import fs from 'fs'
+import * as fs from 'fs'
 import prompts from 'prompts'
 import cli from 'cli-ux'
-import eta from 'eta'
+import * as eta from 'eta'
 
 import Console from '../utils/console'
 import {ValidationError} from '../utils/errors'
 import defaults from '../managers/config/defaults'
 
-import path from 'path'
+import * as path from 'path'
 
 class InitComand extends BaseCommand {
   static description =
@@ -26,7 +26,7 @@ class InitComand extends BaseCommand {
 
     Console.log(Object.getOwnPropertyNames(this))
 
-    let choices = await prompts([
+    const choices = await prompts([
       {
         type: 'select',
         name: 'grading',
@@ -74,9 +74,11 @@ class InitComand extends BaseCommand {
         name: 'duration',
         initial: '1',
         message: 'How many hours avg it takes to complete (number)?',
-        validate: value => {
-          var n = Math.floor(Number(value))
-          return n !== Number.POSITIVE_INFINITY && String(n) === value && n >= 0
+        validate: (value: any) => {
+          const n = Math.floor(Number(value))
+          return (
+            n !== Number.POSITIVE_INFINITY && String(n) === value && n >= 0
+          )
         },
       },
     ])
