@@ -3,7 +3,7 @@ import * as storage from 'node-persist'
 import cli from 'cli-ux'
 // const HOST = "https://8000-a72835c1-5411-423b-86e2-dd8df8faab48.ws-us03.gitpod.io";
 const HOST = 'https://learnpack.herokuapp.com'
-import _fetch from 'isomorphic-fetch'
+import * as _fetch from 'isomorphic-fetch'
 
 interface IHeaders {
   'Content-Type'?: string;

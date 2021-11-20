@@ -1,4 +1,4 @@
-import express from 'express'
+import * as express from 'express'
 import Console from '../../utils/console'
 import addRoutes from './routes'
 import cli from 'cli-ux'

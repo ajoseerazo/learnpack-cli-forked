@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch'
+import * as fetch from 'isomorphic-fetch'
 import Console from './console'
 
 import {ISolution, IError} from '../models/errors'

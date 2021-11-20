@@ -48,7 +48,7 @@ Extra documentation goes here
         Console.error(`Package ${_package} not found`)
       else
         clone(packageInfo.results[0].repository)
-        .then(result => {
+        .then(_result => {
           Console.success('Successfully downloaded')
           Console.info(
             `You can now CD into the folder like this: $ cd ${_package}`,

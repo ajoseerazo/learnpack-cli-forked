@@ -5,7 +5,7 @@ import {cli} from 'cli-ux'
 import * as targz from 'targz'
 import Console from '../utils/console'
 import * as https from 'https'
-import fetch from 'isomorphic-fetch'
+import * as fetch from 'isomorphic-fetch'
 import {InternalError} from '../utils/errors'
 
 export const decompress = (sourcePath: any, destinationPath: any) =>

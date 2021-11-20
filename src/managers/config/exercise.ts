@@ -7,7 +7,7 @@ import allowedExt from './allowed_extensions'
 import {IConfig, IConfigObj} from '../../models/config'
 import {IFile} from '../../models/file'
 
-import frontMatter from 'front-matter'
+const frontMatter = require('front-matter')
 
 export const exercise = (
   path: string,

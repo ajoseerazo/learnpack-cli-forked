@@ -1,5 +1,5 @@
 import Console from '../../utils/console'
-import express from 'express'
+import * as express from 'express'
 import * as fs from 'fs'
 import * as bodyParser from 'body-parser'
 import socket from '../socket'

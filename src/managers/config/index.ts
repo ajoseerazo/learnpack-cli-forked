@@ -4,7 +4,7 @@ import * as shell from 'shelljs'
 import Console from '../../utils/console'
 import watch from '../../utils/watcher'
 import Gitpod from '../gitpod'
-import fetch from 'isomorphic-fetch'
+import * as fetch from 'isomorphic-fetch'
 import {
   ValidationError,
   NotFoundError /* , InternalError */,
