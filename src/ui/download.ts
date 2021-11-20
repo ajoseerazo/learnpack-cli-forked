@@ -3,6 +3,9 @@ import Console from '../utils/console'
 import api from '../utils/api'
 // import fetch from 'node-fetch'
 
+import {ILanguage} from '../models/language'
+import {IPackage} from '../models/package'
+
 export const askPackage = async () => {
   Console.info('No package was specified')
   const languages = await api.getLangs()
@@ -20,16 +23,19 @@ export const askPackage = async () => {
         type: 'select',
         name: 'lang',
         message: 'What language do you want to practice?',
-        choices: languages.map(l => ({message: l.title, name: l.slug})),
+        choices: languages.map((l: ILanguage) => ({
+          message: l.title,
+          name: l.slug,
+        })),
       },
     ])
-    .then(({lang}) => {
+    .then(({lang}: any) => {
       return (async () => {
         const response = await api.getAllPackages({lang})
         const packages = response.results
         if (packages.length === 0) {
           const error = new Error(`No packages found for language ${lang}`)
-          Console.error(error)
+          Console.error(error.message) // TODO: Look this
           return error
         }
 
@@ -38,7 +44,7 @@ export const askPackage = async () => {
             type: 'select',
             name: 'pack',
             message: 'Choose one of the packages available',
-            choices: packages.map(l => ({
+            choices: packages.map((l: IPackage) => ({
               message: `${l.title}, difficulty: ${l.difficulty}, downloads: ${
                 l.downloads
               } ${
@@ -50,7 +56,7 @@ export const askPackage = async () => {
         ])
       })()
     })
-    .then(resp => {
+    .then((resp: any) => {
       if (!resp)
         reject(resp.message || resp)
       else

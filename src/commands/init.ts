@@ -2,7 +2,7 @@ import {flags} from '@oclif/command'
 import BaseCommand from '../utils/BaseCommand'
 
 import * as fs from 'fs'
-import prompts from 'prompts'
+import * as prompts from 'prompts'
 import cli from 'cli-ux'
 import * as eta from 'eta'
 

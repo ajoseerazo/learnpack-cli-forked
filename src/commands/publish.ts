@@ -1,6 +1,6 @@
 // import {Command, flags} from '@oclif/command'
 import {prompt} from 'enquirer'
-import fetch from 'node-fetch'
+import * as fetch from 'isomorphic-fetch'
 import SessionCommand from '../utils/SessionCommand'
 import Console from '../utils/console'
 import api from '../utils/api'
