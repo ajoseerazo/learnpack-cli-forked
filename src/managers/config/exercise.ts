@@ -7,7 +7,8 @@ import allowedExt from './allowed_extensions'
 import {IConfig, IConfigObj} from '../../models/config'
 import {IFile} from '../../models/file'
 
-const frontMatter = require('front-matter')
+// eslint-disable-next-line
+const frontMatter = require('front-matter');
 
 export const exercise = (
   path: string,
