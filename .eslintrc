@@ -18,7 +18,8 @@
     "unicorn/import-style": "off",
     "complexity": "off",
     // "@typescript-eslint/no-var-requires": "warning",
-    "unicorn/no-abusive-eslint-disable": "off"
+    "unicorn/no-abusive-eslint-disable": "off",
+    "brace-style": "error"
   },
   "extends": [
     "oclif", 
