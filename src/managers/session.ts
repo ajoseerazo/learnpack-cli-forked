@@ -60,7 +60,7 @@ const Session: ISession = {
     return !!this.token
   },
   get: async function (configObj?: IConfigObj) {
-    if (configObj) {
+    if (configObj && configObj.config) {
       this.config = configObj.config
     }
 

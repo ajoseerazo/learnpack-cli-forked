@@ -12,8 +12,8 @@ export default (path: string) =>
       ignoreInitial: true,
     })
 
-    const onChange = (eventname: string, filename: string) => {
-      resolve(eventname, filename)
+    const onChange = (eventname: string, _filename: string) => {
+      resolve(eventname /* , filename */)
     }
 
     watcher.on('all', debounce(onChange, 500, true))
