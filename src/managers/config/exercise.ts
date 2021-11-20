@@ -95,7 +95,7 @@ export const exercise = (
       return attr
     },
     getFile: function (name: string) {
-      const file = this.files.find((f: any) => f.name === name)
+      const file: any = this.files.find((f: any) => f.name === name)
       if (!fs.existsSync(file.path))
         throw new Error('File not found: ' + file.path)
       else if (fs.lstatSync(file.path).isDirectory())
