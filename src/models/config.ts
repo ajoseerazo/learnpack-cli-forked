@@ -13,11 +13,19 @@ export interface IEditor {
   version: string;
 }
 
+export type TCompiler =
+  | 'webpack'
+  | 'vanillajs'
+  | 'vue'
+  | 'react'
+  | 'css'
+  | 'html';
+
 export interface IConfig {
   address: string;
   dirPath: string;
   entries: any;
-  grading: 'isolated' | 'grading' | 'no-grading';
+  grading: 'isolated' | 'incremental' | 'no-grading';
   confPath: IConfigPath;
   configPath: string;
   translations: Array<string>;
@@ -26,6 +34,7 @@ export interface IConfig {
   exercisesPath: string;
   actions: Array<any>;
   disable_grading?: boolean;
+  compiler: TCompiler;
   runHook: (...agrs: Array<any>) => void;
 }
 

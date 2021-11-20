@@ -1,7 +1,8 @@
-import {IConfig} from '../models/config'
-import {IExercise} from '../models/exercise'
+import {IConfig} from './config'
 import {Server} from 'socket.io'
 import {DefaultEventsMap} from 'socket.io/dist/typed-events'
+import {TAction, ICallback} from './action'
+import {TStatus} from './status'
 
 export interface ISocket {
   socket: Server<
@@ -11,8 +12,8 @@ export interface ISocket {
     any
   > | null;
   config: IConfig | null;
-  allowedActions: Array<string> | null;
-  actionCallBacks: any;
+  allowedActions: Array<TAction> | null;
+  actionCallBacks: { [key: string]: ICallback };
   addAllowed: (actions: any) => void;
   removeAllowed: (actions: any) => void;
   start: (config: IConfig, server: any) => void;
@@ -21,17 +22,17 @@ export interface ISocket {
   ask: (questions: Array<string>) => void;
   reload: (files: Array<string> | null, exercises: Array<string>) => void;
   log: (
-    status: string,
+    status: TStatus,
     messages?: string | Array<string>,
-    report?: Array<any>,
+    report?: Array<string>,
     data?: any
   ) => void;
   emit: (
-    action: any,
-    status: string,
+    action: TAction,
+    status: TStatus | string,
     logs: string | Array<string>,
-    inputs?: Array<any>,
-    report?: Array<any>,
+    inputs?: Array<string>,
+    report?: Array<string>,
     data?: any
   ) => void;
   ready: (message: string) => void;

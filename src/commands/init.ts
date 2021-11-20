@@ -74,7 +74,7 @@ class InitComand extends BaseCommand {
         name: 'duration',
         initial: '1',
         message: 'How many hours avg it takes to complete (number)?',
-        validate: (value: any) => {
+        validate: (value: string) => {
           const n = Math.floor(Number(value))
           return (
             n !== Number.POSITIVE_INFINITY && String(n) === value && n >= 0
@@ -114,6 +114,7 @@ class InitComand extends BaseCommand {
             './README.md',
             eta.render(
               fs.readFileSync(
+                // eslint-disable-next-line unicorn/prefer-module
                 path.resolve(__dirname, `${templatesDir}/README.ejs`),
                 'utf-8',
               ),

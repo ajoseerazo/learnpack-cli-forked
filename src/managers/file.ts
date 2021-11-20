@@ -8,7 +8,7 @@ import * as https from 'https'
 import * as fetch from 'isomorphic-fetch'
 import {InternalError} from '../utils/errors'
 
-export const decompress = (sourcePath: any, destinationPath: any) =>
+export const decompress = (sourcePath: string, destinationPath: string) =>
   new Promise((resolve, reject) => {
     Console.debug('Decompressing ' + sourcePath)
     targz.decompress(
@@ -16,7 +16,7 @@ export const decompress = (sourcePath: any, destinationPath: any) =>
         src: sourcePath,
         dest: destinationPath,
       },
-      function (err: any) {
+      function (err: string | Error | null) {
         if (err) {
           Console.error('Error when trying to decompress')
           reject(err)
@@ -28,7 +28,7 @@ export const decompress = (sourcePath: any, destinationPath: any) =>
     )
   })
 
-export const downloadEditor = async (version: any, destination: any) => {
+export const downloadEditor = async (version: string, destination: string) => {
   // https://raw.githubusercontent.com/learnpack/coding-ide/master/dist/app.tar.gz
   // if(versions[version] === undefined) throw new Error(`Invalid editor version ${version}`)
   const resp2 = await fetch(
@@ -48,7 +48,7 @@ export const downloadEditor = async (version: any, destination: any) => {
   )
 }
 
-export const download = (url: any, dest: any) => {
+export const download = (url: string, dest: string) => {
   Console.debug('Downloading ' + url)
   return new Promise((resolve, reject) => {
     const request = https.get(url, response => {
@@ -71,12 +71,14 @@ export const download = (url: any, dest: any) => {
       } else if (response.statusCode === 302 || response.statusCode === 301) {
         // Console.debug("Servers redirected to "+response.headers.location)
         // Recursively follow redirects, only a 200 will resolve.
-        download(response.headers.location, dest)
-        .then(() => resolve(/* */ null))
-        .catch(error => {
-          Console.error(error)
-          reject(error)
-        })
+        if (response.headers.location) {
+          download(response.headers.location, dest)
+          .then(() => resolve(/* */ null))
+          .catch(error => {
+            Console.error(error)
+            reject(error)
+          })
+        }
       } else {
         Console.debug(
           `Server responded with ${response.statusCode}: ${response.statusMessage}`,
