@@ -1,14 +1,14 @@
-// import {Command, flags} from '@oclif/command'
+// import  {Command, flags} from '@oclif/command'
 // import { prompt } from "enquirer"
 // import fetch from 'node-fetch'
 import SessionCommand from '../utils/SessionCommand'
 import SessionManager from '../managers/session'
-import Console from '../utils/console'
+// import Console from '../utils/console'
 // import { replace } from 'node-emoji'
 // import { validURL } from "../utils/validators"
 // const BaseCommand from '../utils/BaseCommand');
 
-class LoginCommand extends SessionCommand {
+class LogoutCommand extends SessionCommand {
   static description = `Describe the command here
   ...
   Extra documentation goes here
@@ -29,20 +29,15 @@ class LoginCommand extends SessionCommand {
   ]
 
   async init() {
-    const {flags} = this.parse(LoginCommand)
+    const {flags} = this.parse(LogoutCommand)
     await this.initSession(flags)
   }
 
   async run() {
-    /* const {flags, args} = */ this.parse(LoginCommand)
+    // const {flags, args} = this.parse(LogoutCommand)
 
-    try {
-      await SessionManager.login()
-    } catch (error) {
-      Console.error('Error trying to authenticate')
-      Console.error((error as TypeError).message || (error as string))
-    }
+    SessionManager.destroy()
   }
 }
 
-export default LoginCommand
+export default LogoutCommand
