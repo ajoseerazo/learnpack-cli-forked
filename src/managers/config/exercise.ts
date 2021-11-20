@@ -5,6 +5,7 @@ import Console from '../../utils/console'
 import allowedExt from './allowed_extensions'
 
 import {IConfig, IConfigObj} from '../../models/config'
+import {IFile} from '../../models/file'
 
 export const exercise = (
   path: string,
@@ -55,8 +56,8 @@ export const exercise = (
     path,
     slug,
     translations,
-    language: detected.language,
-    entry: detected.entry ? path + '/' + detected.entry : null, // full path to the exercise entry
+    language: detected?.language,
+    entry: detected?.entry ? path + '/' + detected.entry : null, // full path to the exercise entry
     title: slug || 'Exercise',
     graded: files.some(
       file =>
@@ -95,13 +96,17 @@ export const exercise = (
       return attr
     },
     getFile: function (name: string) {
-      const file: any = this.files.find((f: any) => f.name === name)
-      if (!fs.existsSync(file.path))
-        throw new Error('File not found: ' + file.path)
-      else if (fs.lstatSync(file.path).isDirectory())
+      const file: IFile | undefined = this.files.find(
+        (f: any) => f.name === name,
+      )
+
+      if (!file || !fs.existsSync(file.path)) {
+        throw new Error(`File not found: + ${file?.path}`)
+      } else if (fs.lstatSync(file.path).isDirectory()) {
         return (
           'Error: This is not a file to be read, but a directory: ' + file.path
         )
+      }
 
       // get file content
       const content = fs.readFileSync(file.path)
@@ -122,18 +127,25 @@ export const exercise = (
       return content
     },
     saveFile: function (name: string, content: string) {
-      const file = this.files.find((f: any) => f.name === name)
-      if (!fs.existsSync(file.path))
-        throw new Error('File not found: ' + file.path)
-      return fs.writeFileSync(file.path, content, 'utf8')
+      const file: IFile | undefined = this.files.find(
+        (f: any) => f.name === name,
+      )
+
+      if (file) {
+        if (!fs.existsSync(file.path)) {
+          throw new Error('File not found: ' + file.path)
+        }
+
+        return fs.writeFileSync(file.path, content, 'utf8')
+      }
     },
     getTestReport: function () {
-      const _path = `${config.confPath.base}/reports/${this.slug}.json`
+      const _path = `${config?.confPath.base}/reports/${this.slug}.json`
       if (!fs.existsSync(_path))
         return {}
 
       const content = fs.readFileSync(_path)
-      const data = JSON.parse(content)
+      const data = JSON.parse(`${content}`)
       return data
     },
   }
@@ -178,7 +190,11 @@ export const isDirectory = (source: string) => {
   return fs.lstatSync(source).isDirectory()
 }
 
-export const detect = (config: IConfig, files: Array<string>) => {
+export const detect = (config: IConfig | undefined, files: Array<string>) => {
+  if (!config) {
+    return
+  }
+
   if (!config.entries)
     throw new Error(
       "No configuration found for entries, please add a 'entries' object with the default file name for your exercise entry file that is going to be used while compiling, for example: index.html for html, app.py for python3, etc.",
