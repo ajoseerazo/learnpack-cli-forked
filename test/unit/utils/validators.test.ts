@@ -4,6 +4,7 @@ import {validURL} from '../../../src/utils/validators'
 
 const EXAMPLE_URL = 'https://example.com'
 const GITHUB_URL = 'https://github.com'
+const INVALID_URL = 'WHATEVER'
 
 describe('validURL', () => {
   it('should return false if param url is not a github url', () => {
@@ -12,7 +13,7 @@ describe('validURL', () => {
   })
 
   it('should return false is param url is not a valid url', () => {
-    const isValid = validURL('whatever')
+    const isValid = validURL(INVALID_URL)
     assert.equal(isValid, false)
   })
 
