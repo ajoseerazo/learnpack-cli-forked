@@ -52,12 +52,12 @@ class PublishCommand extends SessionCommand {
       )
     }
 
-    if (!validURL(configObject?.repository)) {
+    if (!validURL(configObject?.repository ?? '')) {
       throw new Error(
         "The package has a missing or invalid 'repository' on the configuration file, it needs to be a Github URL",
       )
     } else {
-      const validateResp = await fetch(configObject.repository)
+      const validateResp = await fetch(configObject.repository ?? '')
       if (validateResp.status !== 200) {
         throw new Error(
           `The specified repository URL on the configuration file does not exist or its private, only public repositories are allowed at the moment: ${configObject.repository}`,

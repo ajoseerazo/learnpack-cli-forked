@@ -281,8 +281,7 @@ export default async ({
   return configManager
 }
 
-// eslint-disable-next-line
-function deepMerge(...sources: any) {
+function deepMerge(...sources: any): any {
   // eslint-disable-next-line
   let acc: any = {};
   for (const source of sources) {
