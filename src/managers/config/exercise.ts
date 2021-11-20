@@ -1,4 +1,4 @@
-import p from 'path'
+import * as p from 'path'
 import frontMatter from 'front-matter'
 import * as fs from 'fs'
 import Console from '../../utils/console'

@@ -1,4 +1,4 @@
-import path from 'path'
+import * as path from 'path'
 import * as fs from 'fs'
 import * as shell from 'shelljs'
 import Console from '../../utils/console'
@@ -199,7 +199,7 @@ export default async ({
 
       const isDirectory = (source: string) => {
         const name = path.basename(source)
-        if (name === path.basename(configObj?.config?.dirPath))
+        if (name === path.basename(configObj?.config?.dirPath || ''))
           return false
         // ignore folders that start with a dot
         if (name.charAt(0) === '.' || name.charAt(0) === '_')
