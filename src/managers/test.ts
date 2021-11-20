@@ -1,17 +1,17 @@
-const path = require('path');
-let shell = require('shelljs');
-const fs = require('fs');
-let { TestingError } = require('./errors');
-let Console = require('../utils/console');
-const color = require('colors');
-const bcActivity = require('./bcActivity.js');
+/* import * as path from 'path'
+import * as shell from 'shelljs'
+import * as fs from 'fs'
+import {TestingError} from './errors'
+import Console from '../utils/console'
+// import color from 'colors'
+import bcActivity from './bcActivity.js'
 
-module.exports = async function({ socket, files, config, slug }){
-
+export default async function({ socket, files, config, slug }: any){
   const configPath = path.resolve(__dirname,`./config/tester/${config.tester}/${config.language}.config.js`);
+
   if (!fs.existsSync(configPath)) throw CompilerError(`Uknown testing engine for compiler: '${config.language}'`);
 
-      const testingConfig = require(configPath)(files, config, slug);
+      const testingConfig from configPath)(files, config, slug);
       testingConfig.validate();
 
       if(config.ignoreTests) throw TestingError('Grading is disabled on learn.json file.');
@@ -45,7 +45,6 @@ module.exports = async function({ socket, files, config, slug }){
         socket.log('testing-success',[ stdout || stderr ].concat(["😁Everything is amazing!"]));
         Console.success("Everything is amazing!");
 
-
         bcActivity.activity('exercise_success', {
           language: config.language,
           slug: slug,
@@ -57,7 +56,6 @@ module.exports = async function({ socket, files, config, slug }){
           return e;
         });
       }
-
 
       if(typeof testingConfig.cleanup !== "undefined"){
         if(typeof testingConfig.cleanup === 'function' || typeof testingConfig.cleanup === 'object'){
@@ -74,4 +72,6 @@ module.exports = async function({ socket, files, config, slug }){
       }
 
       return true;
-};
+}; */
+
+export default {}
