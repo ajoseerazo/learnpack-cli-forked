@@ -21,11 +21,14 @@ export type TCompiler =
   | 'css'
   | 'html';
 
+export type TGrading = 'isolated' | 'incremental' | 'no-grading';
+
 export interface IConfig {
+  port?: string;
   address: string;
   dirPath: string;
   entries: any;
-  grading: 'isolated' | 'incremental' | 'no-grading';
+  grading: TGrading;
   confPath: IConfigPath;
   configPath: string;
   translations: Array<string>;
@@ -38,8 +41,10 @@ export interface IConfig {
   runHook: (...agrs: Array<any>) => void;
 }
 
+export type TConfigObjAttributes = 'config' | 'exercises' | 'grading';
+
 export interface IConfigObj {
   config?: IConfig;
   exercises?: Array<IExercise>;
-  grading?: 'isolated' | 'grading' | 'no-grading';
+  grading?: TGrading;
 }

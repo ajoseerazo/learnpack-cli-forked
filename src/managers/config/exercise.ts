@@ -12,7 +12,7 @@ const frontMatter = require('front-matter');
 
 export const exercise = (
   path: string,
-  position: any,
+  position: number,
   configObject: IConfigObj,
 ) => {
   const {config, exercises} = configObject
@@ -38,7 +38,7 @@ export const exercise = (
         "es": "path/to/Readme.es.md"
       }
       */
-  const translations: { [key: string]: any } = {}
+  const translations: { [key: string]: string } = {}
   for (const file of files.filter(file =>
     file.toLowerCase().includes('readme'),
   )) {
@@ -100,7 +100,7 @@ export const exercise = (
     },
     getFile: function (name: string) {
       const file: IFile | undefined = this.files.find(
-        (f: any) => f.name === name,
+        (f: IFile) => f.name === name,
       )
 
       if (!file || !fs.existsSync(file.path)) {
@@ -131,7 +131,7 @@ export const exercise = (
     },
     saveFile: function (name: string, content: string) {
       const file: IFile | undefined = this.files.find(
-        (f: any) => f.name === name,
+        (f: IFile) => f.name === name,
       )
 
       if (file) {
@@ -168,7 +168,7 @@ export const isCodable = (str: string) => {
   return allowedExt.includes(extension.slice(1).toLowerCase())
 }
 
-export const shouldBeVisible = function (file: any) {
+export const shouldBeVisible = function (file: IFile) {
   return (
     // doest not have "test." on their name
     !file.name.toLocaleLowerCase().includes('test.') &&

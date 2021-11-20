@@ -14,7 +14,15 @@ import defaults from './defaults'
 import {exercise} from './exercise'
 
 import {rmSync} from '../file'
-import {IConfigObj, IExercise} from '../../models/config'
+import {
+  IConfigObj,
+  IExercise,
+  TConfigObjAttributes,
+} from '../../models/config'
+import {
+  IConfigManagerAttributes,
+  IConfigManager,
+} from '../../models/config-manager'
 /* exercise folder name standard */
 
 const getConfigPath = () => {
@@ -45,9 +53,9 @@ const getExercisesPath = (base: string) => {
 
 export default async ({
   grading,
-  /* editor, */ disableGrading,
+  disableGrading,
   version,
-}: any) => {
+}: IConfigManagerAttributes): Promise<IConfigManager> => {
   const confPath = getConfigPath()
   Console.debug('This is the config path: ', confPath)
 
@@ -134,7 +142,7 @@ export default async ({
     configObj.config.exercisesPath = getExercisesPath(confPath.base) || './'
   }
 
-  return {
+  const configManager: IConfigManager = {
     get: () => configObj,
     clean: () => {
       const ignore = new Set(['config', 'exercises', 'session'])
@@ -148,11 +156,12 @@ export default async ({
           fs.unlinkSync(configObj.config.dirPath + '/app.tar.gz')
 
         // clean configuration object
-        const _new: { [key: string]: any } = {}
+        // eslint-disable-next-line
+        const _new: { [key: string]: any } = {};
 
         for (const key of Object.keys(configObj)) {
           if (!ignore.has(key))
-            _new[key] = (configObj as any)[key]
+            _new[key] = configObj[key as TConfigObjAttributes]
         }
 
         if (configObj.config.configPath) {
@@ -271,10 +280,14 @@ export default async ({
       }
     },
   }
+
+  return configManager
 }
 
+// eslint-disable-next-line
 function deepMerge(...sources: any) {
-  let acc: any = {}
+  // eslint-disable-next-line
+  let acc: any = {};
   for (const source of sources) {
     if (Array.isArray(source)) {
       if (!Array.isArray(acc)) {
@@ -283,11 +296,8 @@ function deepMerge(...sources: any) {
 
       acc = [...source]
     } else if (source instanceof Object) {
+      // eslint-disable-next-line
       for (let [key, value] of Object.entries(source)) {
-        /* Workaround */
-        const tmpKey = key
-        key = value as any
-        key = tmpKey
         if (value instanceof Object && key in acc) {
           value = deepMerge(acc[key], value)
         }
