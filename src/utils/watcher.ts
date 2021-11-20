@@ -1,5 +1,5 @@
 import * as chokidar from 'chokidar'
-import * as debounce from 'debounce'
+import debounce from 'debounce'
 
 export default (path: string) =>
   new Promise((resolve /* , reject */) => {

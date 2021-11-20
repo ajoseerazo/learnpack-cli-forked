@@ -22,7 +22,7 @@ export interface ISocket {
   reload: (files: Array<string> | null, exercises: Array<string>) => void;
   log: (
     status: string,
-    messages: string | Array<string>,
+    messages?: string | Array<string>,
     report?: Array<any>,
     data?: any
   ) => void;

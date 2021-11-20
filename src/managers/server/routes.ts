@@ -1,5 +1,5 @@
 import Console from '../../utils/console'
-import * as express from 'express'
+import express from 'express'
 import * as fs from 'fs'
 import * as bodyParser from 'body-parser'
 import socket from '../socket'
@@ -85,7 +85,7 @@ export default async function (
         Console.debug('Exercise updated files: ', exercise.files)
         // if a new language for the testing engine is detected, we replace it
         // if not we leave it as it was before
-        if (detected.language) {
+        if (detected?.language) {
           Console.debug(
             `Switching to ${detected.language} engine in this exercise`,
           )
@@ -93,8 +93,8 @@ export default async function (
         }
 
         // WARNING: has to be the FULL PATH to the entry path
-        exercise.entry = detected.entry
-        Console.debug(`Exercise detected entry: ${detected.entry}`)
+        exercise.entry = detected?.entry
+        Console.debug(`Exercise detected entry: ${detected?.entry}`)
       }
 
       if (!exercise.graded || config.disableGrading) {

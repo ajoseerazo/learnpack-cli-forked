@@ -1,11 +1,13 @@
 import * as p from 'path'
-import frontMatter from 'front-matter'
+// import frontMatter from 'front-matter'
 import * as fs from 'fs'
 import Console from '../../utils/console'
 import allowedExt from './allowed_extensions'
 
 import {IConfig, IConfigObj} from '../../models/config'
 import {IFile} from '../../models/file'
+
+import frontMatter from 'front-matter'
 
 export const exercise = (
   path: string,

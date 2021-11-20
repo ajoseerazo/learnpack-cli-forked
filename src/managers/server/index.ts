@@ -1,6 +1,6 @@
-import * as express from 'express'
+import express from 'express'
 import Console from '../../utils/console'
-import addRoutes from './routes.js'
+import addRoutes from './routes'
 import cli from 'cli-ux'
 import * as http from 'http'
 
@@ -9,7 +9,7 @@ export default async function (configObj: any, configManager: any) {
   const app = express()
   const server = http.createServer(app)
 
-  app.use(function (req, res, next) {
+  app.use(function (req: any, res: any, next: any) {
     res.header('Access-Control-Allow-Origin', '*')
     res.header(
       'Access-Control-Allow-Headers',
