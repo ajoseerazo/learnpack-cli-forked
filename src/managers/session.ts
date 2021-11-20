@@ -8,7 +8,7 @@ import * as fs from 'fs'
 import cli from 'cli-ux'
 import * as storage from 'node-persist'
 
-import {ISession, IValue, IStartProps} from '../models/session'
+import {IPayload, ISession, IStartProps} from '../models/session'
 import {IConfigObj} from '../models/config'
 
 const Session: ISession = {
@@ -32,7 +32,7 @@ const Session: ISession = {
 
     return true
   },
-  setPayload: async function (value: IValue) {
+  setPayload: async function (value: IPayload) {
     await this.initialize()
     await storage.setItem('bc-payload', {token: this.token, ...value})
     Console.debug('Payload successfuly found and set for ' + value.email)

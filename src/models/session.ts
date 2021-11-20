@@ -1,12 +1,12 @@
 import {IConfig, IConfigObj} from './config'
 
-export interface IValue {
+export interface IPayload {
   email: string;
 }
 
 export interface IStartProps {
   token: string;
-  payload: any;
+  payload: IPayload | null;
 }
 
 export interface ISession {
@@ -15,7 +15,7 @@ export interface ISession {
   config: IConfig | null;
   currentCohort: null;
   initialize: () => Promise<boolean>;
-  setPayload: (value: IValue) => Promise<boolean>;
+  setPayload: (value: IPayload) => Promise<boolean>;
   getPayload: () => Promise<any>;
   isActive: () => boolean;
   get: (config?: IConfigObj) => Promise<any>;
