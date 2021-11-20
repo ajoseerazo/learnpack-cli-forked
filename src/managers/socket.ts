@@ -1,9 +1,11 @@
-import connect from 'socket.io'
+import {Server} from 'socket.io'
 import Console from '../utils/console'
 
 import {IExercise} from '../models/exercise'
+import {ISocket} from '../models/socket'
+import {IConfig} from '../models/config'
 
-export default {
+const SocketManager: ISocket = {
   socket: null,
   config: null,
   allowedActions: null,
@@ -40,7 +42,7 @@ export default {
       a => !actions.includes(a),
     ) as any
   },
-  start: function (config: any, server: any) {
+  start: function (config: IConfig, server: any) {
     this.config = config
 
     // remove test action if grading is disabled
@@ -48,7 +50,7 @@ export default {
       config.disable_grading ? act !== 'test' : true,
     )
 
-    this.socket = connect(server)
+    this.socket = new Server(server)
 
     if (this.socket) {
       (this.socket as any).on('connection', (socket: any) => {
@@ -94,9 +96,12 @@ export default {
     })
   },
   reload: function (files: Array<string> | null, exercises: Array<IExercise>) {
-    this.emit('reload', files, exercises)
+    this.emit(
+      'reload',
+      files?.join('') || '' /* TODO: Check it out this */,
+      exercises,
+    )
   },
-
   log: function (
     status: any,
     messages: any = [],
@@ -161,3 +166,5 @@ export default {
     throw msg
   },
 }
+
+export default SocketManager
