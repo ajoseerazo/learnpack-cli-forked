@@ -101,7 +101,10 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "*.{js,ts}": ["eslint --cache --fix", "npm run test"],
+    "*.{js,ts}": [
+      "eslint --cache --fix", 
+      "npm run test"
+    ],
     "*.{js,css,md,ts}": "prettier --write"
   }
 }
