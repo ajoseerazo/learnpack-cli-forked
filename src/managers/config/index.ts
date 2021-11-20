@@ -139,7 +139,7 @@ export default async ({
     clean: () => {
       const ignore = new Set(['config', 'exercises', 'session'])
 
-      if (configObj.config) {
+      if (configObj.config && configObj.config.outputPath) {
         rmSync(configObj.config.outputPath)
         rmSync(configObj.config.dirPath + '/_app')
 
@@ -164,7 +164,7 @@ export default async ({
       }
     },
     getExercise: (slug: string) => {
-      const exercise = configObj.exercises.find(
+      const exercise = configObj?.exercises?.find(
         (ex: IExercise) => ex.slug === slug,
       )
       if (!exercise)
@@ -176,7 +176,7 @@ export default async ({
       if (!fs.existsSync(`${configObj?.config?.dirPath}/resets/` + slug))
         throw ValidationError('Could not find the original files for ' + slug)
 
-      const exercise = configObj.exercises.find(
+      const exercise = configObj?.exercises?.find(
         (ex: IExercise) => ex.slug === slug,
       )
       if (!exercise) {

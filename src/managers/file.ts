@@ -5,7 +5,7 @@ import {cli} from 'cli-ux'
 import * as targz from 'targz'
 import Console from '../utils/console'
 import * as https from 'https'
-import fetch from 'node-fetch'
+import * as fetch from 'isomorphic-fetch'
 
 export const decompress = (sourcePath: any, destinationPath: any) =>
   new Promise((resolve, reject) => {
