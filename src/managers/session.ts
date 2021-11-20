@@ -9,6 +9,7 @@ import cli from 'cli-ux'
 import * as storage from 'node-persist'
 
 import {ISession, IValue, IStartProps} from '../models/session'
+import {IConfigObj} from '../models/config'
 
 const Session: ISession = {
   sessionStarted: false,
@@ -58,7 +59,7 @@ const Session: ISession = {
     } */
     return !!this.token
   },
-  get: async function (configObj = null) {
+  get: async function (configObj?: IConfigObj) {
     if (configObj) {
       this.config = configObj.config
     }

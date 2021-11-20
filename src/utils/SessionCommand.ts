@@ -2,7 +2,7 @@
 import BaseCommand from './BaseCommand'
 import Console from './console'
 import SessionManager from '../managers/session'
-import configManager from '../managers/config/index.js'
+import configManager from '../managers/config/index'
 import {AuthError} from './errors'
 
 export default class SessionCommand extends BaseCommand {
