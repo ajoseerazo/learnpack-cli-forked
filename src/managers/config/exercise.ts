@@ -6,6 +6,7 @@ import allowedExt from './allowed_extensions'
 
 import {IConfig, IConfigObj} from '../../models/config'
 import {IFile} from '../../models/file'
+import {IExercise} from '../../models/exercise-obj'
 
 // eslint-disable-next-line
 const frontMatter = require('front-matter');
@@ -14,7 +15,7 @@ export const exercise = (
   path: string,
   position: number,
   configObject: IConfigObj,
-) => {
+): IExercise => {
   const {config, exercises} = configObject
   let slug = p.basename(path)
 
@@ -54,7 +55,8 @@ export const exercise = (
     slug = 'default-index'
 
   const detected = detect(config, files)
-  return {
+
+  const exerciseObj: IExercise = {
     position,
     path,
     slug,
@@ -152,6 +154,8 @@ export const exercise = (
       return data
     },
   }
+
+  return exerciseObj
 }
 
 export const validateExerciseDirectoryName = (str: string) => {
@@ -249,7 +253,10 @@ export const filterFiles = (files: Array<string>, basePath = '.') =>
   .map((ex: string) => ({
     path: basePath + '/' + ex,
     name: ex,
-    hidden: !shouldBeVisible({name: ex, path: basePath + '/' + ex}),
+    hidden: !shouldBeVisible({
+      name: ex,
+      path: basePath + '/' + ex,
+    } as IFile),
   }))
   .sort((f1, f2) => {
     const score: { [key: string]: number } = {

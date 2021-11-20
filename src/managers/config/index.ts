@@ -14,15 +14,12 @@ import defaults from './defaults'
 import {exercise} from './exercise'
 
 import {rmSync} from '../file'
-import {
-  IConfigObj,
-  IExercise,
-  TConfigObjAttributes,
-} from '../../models/config'
+import {IConfigObj, TConfigObjAttributes} from '../../models/config'
 import {
   IConfigManagerAttributes,
   IConfigManager,
 } from '../../models/config-manager'
+import {IExercise} from '../../models/exercise-obj'
 /* exercise folder name standard */
 
 const getConfigPath = () => {
@@ -172,7 +169,7 @@ export default async ({
         }
       }
     },
-    getExercise: (slug: string) => {
+    getExercise: (slug: string): IExercise => {
       const exercise = configObj?.exercises?.find(
         (ex: IExercise) => ex.slug === slug,
       )

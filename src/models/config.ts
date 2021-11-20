@@ -1,8 +1,4 @@
-export interface IExercise {
-  slug: string;
-  path: string;
-  done: boolean;
-}
+import {IExercise} from './exercise-obj'
 
 export interface IConfigPath {
   base: string;
@@ -37,6 +33,7 @@ export interface IConfig {
   exercisesPath: string;
   actions: Array<any>;
   disable_grading?: boolean;
+  disableGrading?: boolean;
   compiler: TCompiler;
   runHook: (...agrs: Array<any>) => void;
 }

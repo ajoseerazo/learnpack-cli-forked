@@ -1,4 +1,5 @@
-import {IConfigObj, IExercise, TGrading} from './config'
+import {IConfigObj, TGrading} from './config'
+import {IExercise} from './exercise-obj'
 
 export interface IConfigManagerAttributes {
   grading: TGrading;
