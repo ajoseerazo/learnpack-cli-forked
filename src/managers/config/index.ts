@@ -4,7 +4,7 @@ import * as shell from 'shelljs'
 import Console from '../../utils/console'
 import watch from '../../utils/watcher'
 import Gitpod from '../gitpod'
-import fetch from 'node-fetch'
+import * as fetch from 'isomorphic-fetch'
 import {
   ValidationError,
   NotFoundError /* , InternalError */,
@@ -14,6 +14,7 @@ import defaults from './defaults'
 import {exercise} from './exercise'
 
 import {rmSync} from '../file'
+import {IConfigObj, IExercise} from '../../models/config'
 /* exercise folder name standard */
 
 const getConfigPath = () => {
@@ -29,7 +30,7 @@ const getConfigPath = () => {
   }
 
   if (config === null) {
-    throw new NotFoundError(
+    throw NotFoundError(
       'learn.json file not found on current folder, is this a learnpack package?',
     )
   }
@@ -50,14 +51,14 @@ export default async ({
   const confPath = getConfigPath()
   Console.debug('This is the config path: ', confPath)
 
-  let configObj = {}
+  let configObj: IConfigObj = {}
   if (confPath) {
     const bcContent = fs.readFileSync(confPath.config)
 
     let hiddenBcContent = {}
     if (fs.existsSync(confPath.base + '/config.json')) {
       hiddenBcContent = fs.readFileSync(confPath.base + '/config.json')
-      hiddenBcContent = JSON.parse(hiddenBcContent)
+      hiddenBcContent = JSON.parse(`${hiddenBcContent}`)
       if (!hiddenBcContent) {
         throw new Error(
           `Invalid ${confPath.base}/config.json syntax: Unable to parse.`,
@@ -65,7 +66,7 @@ export default async ({
       }
     }
 
-    const jsonConfig = JSON.parse(bcContent)
+    const jsonConfig = JSON.parse(`${bcContent}`)
     if (!jsonConfig) {
       throw new Error(`Invalid ${confPath.config} syntax: Unable to parse.`)
     }
@@ -82,7 +83,7 @@ export default async ({
     })
     Console.debug('Content form the configuration .json ', configObj)
   } else {
-    throw new ValidationError(
+    throw ValidationError(
       'No learn.json file has been found, make sure you are in the folder',
     )
   }
@@ -93,28 +94,34 @@ export default async ({
       configPath: confPath.config,
     },
   })
-  configObj.config.outputPath = confPath.base + '/dist'
+
+  if (configObj.config) {
+    configObj.config.outputPath = confPath.base + '/dist'
+  }
 
   Console.debug('This is your configuration object: ', {
     ...configObj,
     exercises: configObj.exercises ?
-      configObj.exercises.map(e => e.slug) :
+      configObj.exercises.map((e: IExercise) => e.slug) :
       [],
   })
 
   // Assign default editor mode if not set already
-  if (configObj.config.editor.mode === null) {
+  if (configObj.config?.editor?.mode === null) {
     configObj.config.editor.mode = shell.which('gp') ?
       (configObj.config.editor.mode = 'gitpod') :
       'standalone'
   }
 
-  if (configObj.config.editor.mode === 'gitpod')
+  if (configObj.config?.editor?.mode === 'gitpod') {
     Gitpod.setup(configObj.config)
+  }
 
-  if (version)
-    configObj.config.editor.version = version
-  else if (configObj.config.editor.version === null) {
+  if (version) {
+    if (configObj && configObj.config && configObj.config.editor) {
+      configObj.config.editor.version = version
+    }
+  } else if (configObj.config?.editor?.version === null) {
     const resp = await fetch(
       'https://raw.githubusercontent.com/learnpack/coding-ide/learnpack/package.json',
     )
@@ -122,57 +129,67 @@ export default async ({
     configObj.config.editor.version = packageJSON.version || '1.0.0'
   }
 
-  configObj.config.dirPath = './' + confPath.base
-  configObj.config.exercisesPath = getExercisesPath(confPath.base) || './'
+  if (configObj && configObj.config) {
+    configObj.config.dirPath = './' + confPath.base
+    configObj.config.exercisesPath = getExercisesPath(confPath.base) || './'
+  }
 
   return {
     get: () => configObj,
     clean: () => {
       const ignore = new Set(['config', 'exercises', 'session'])
 
-      rmSync(configObj.config.outputPath)
-      rmSync(configObj.config.dirPath + '/_app')
+      if (configObj.config) {
+        rmSync(configObj.config.outputPath)
+        rmSync(configObj.config.dirPath + '/_app')
 
-      // clean tag gz
-      if (fs.existsSync(configObj.config.dirPath + '/app.tar.gz'))
-        fs.unlinkSync(configObj.config.dirPath + '/app.tar.gz')
+        // clean tag gz
+        if (fs.existsSync(configObj.config.dirPath + '/app.tar.gz'))
+          fs.unlinkSync(configObj.config.dirPath + '/app.tar.gz')
 
-      // clean configuration object
-      const _new = {}
-      for (const key of Object.keys(configObj)) {
-        if (!ignore.has(key))
-          _new[key] = configObj[key]
+        // clean configuration object
+        const _new: { [key: string]: any } = {}
+
+        for (const key of Object.keys(configObj)) {
+          if (!ignore.has(key))
+            _new[key] = (configObj as any)[key]
+        }
+
+        if (configObj.config.configPath) {
+          fs.writeFileSync(
+            configObj.config.configPath,
+            JSON.stringify(_new, null, 4),
+          )
+        }
       }
-
-      fs.writeFileSync(
-        configObj.config.configPath,
-        JSON.stringify(_new, null, 4),
-      )
     },
-    getExercise: slug => {
-      const exercise = configObj.exercises.find(ex => ex.slug === slug)
+    getExercise: (slug: string) => {
+      const exercise = configObj.exercises.find(
+        (ex: IExercise) => ex.slug === slug,
+      )
       if (!exercise)
-        throw new ValidationError(`Exercise ${slug} not found`)
+        throw ValidationError(`Exercise ${slug} not found`)
 
       return exercise
     },
-    reset: slug => {
-      if (!fs.existsSync(`${configObj.config.dirPath}/resets/` + slug))
-        throw new ValidationError(
-          'Could not find the original files for ' + slug,
-        )
+    reset: (slug: string) => {
+      if (!fs.existsSync(`${configObj?.config?.dirPath}/resets/` + slug))
+        throw ValidationError('Could not find the original files for ' + slug)
 
-      const exercise = configObj.exercises.find(ex => ex.slug === slug)
-      if (!exercise)
-        throw new ValidationError(
+      const exercise = configObj.exercises.find(
+        (ex: IExercise) => ex.slug === slug,
+      )
+      if (!exercise) {
+        throw ValidationError(
           `Exercise ${slug} not found on the configuration`,
         )
+      }
 
       for (const fileName of fs.readdirSync(
-        `${configObj.config.dirPath}/resets/${slug}/`,
+        `${configObj?.config?.dirPath}/resets/${slug}/`,
       )) {
         const content = fs.readFileSync(
-          `${configObj.config.dirPath}/resets/${slug}/${fileName}`,
+          `${configObj?.config?.dirPath}/resets/${slug}/${fileName}`,
         )
         fs.writeFileSync(`${exercise.path}/${fileName}`, content)
       }
@@ -180,9 +197,9 @@ export default async ({
     buildIndex: function () {
       Console.info('Building the exercise index...')
 
-      const isDirectory = source => {
+      const isDirectory = (source: string) => {
         const name = path.basename(source)
-        if (name === path.basename(configObj.config.dirPath))
+        if (name === path.basename(configObj?.config?.dirPath))
           return false
         // ignore folders that start with a dot
         if (name.charAt(0) === '.' || name.charAt(0) === '_')
@@ -191,7 +208,7 @@ export default async ({
         return fs.lstatSync(source).isDirectory()
       }
 
-      const getDirectories = source =>
+      const getDirectories = (source: string) =>
         fs
         .readdirSync(source)
         .map(name => path.join(source, name))
@@ -201,25 +218,29 @@ export default async ({
         fs.mkdirSync(confPath.base)
       // add the outout folder where webpack will publish the the html/css/js files
       if (
-        configObj.config.outputPath &&
+        configObj?.config?.outputPath &&
         !fs.existsSync(configObj.config.outputPath)
       )
         fs.mkdirSync(configObj.config.outputPath)
 
       // TODO: we could use npm library front-mater to read the title of the exercises from the README.md
-      const grupedByDirectory = getDirectories(configObj.config.exercisesPath)
-      configObj.exercises =
-        grupedByDirectory.length > 0 ?
-          grupedByDirectory.map((path, position) =>
-            exercise(path, position, configObj),
-          ) :
-          [exercise(configObj.config.exercisesPath, 0, configObj)]
-      this.save()
+      if (configObj?.config?.exercisesPath) {
+        const grupedByDirectory = getDirectories(
+          configObj.config.exercisesPath,
+        )
+        configObj.exercises =
+          grupedByDirectory.length > 0 ?
+            grupedByDirectory.map((path, position) =>
+              exercise(path, position, configObj),
+            ) :
+            [exercise(configObj.config.exercisesPath, 0, configObj)]
+        this.save()
+      }
     },
-    watchIndex: function (onChange = null) {
-      if (!configObj.config.exercisesPath)
-        throw new ValidationError(
-          'No exercises directory to watch: ' + configObj.config.exercisesPath,
+    watchIndex: function (onChange: () => void) {
+      if (!configObj?.config?.exercisesPath)
+        throw ValidationError(
+          `No exercises directory to watch: ${configObj?.config?.exercisesPath}`,
         )
 
       this.buildIndex()
@@ -227,8 +248,9 @@ export default async ({
       .then((/* eventname, filename */) => {
         Console.debug('Changes detected on your exercises')
         this.buildIndex()
-        if (onChange)
+        if (onChange) {
           onChange()
+        }
       })
       .catch(error => {
         throw error
@@ -236,21 +258,23 @@ export default async ({
     },
     save: (/* config = null */) => {
       // remove the duplicates form the actions array
-      configObj.config.actions = [...new Set(configObj.config.actions)]
-      configObj.config.translations = [
-        ...new Set(configObj.config.translations),
-      ]
+      if (configObj.config) {
+        configObj.config.actions = [...new Set(configObj.config.actions)]
+        configObj.config.translations = [
+          ...new Set(configObj.config.translations),
+        ]
 
-      fs.writeFileSync(
-        configObj.config.dirPath + '/config.json',
-        JSON.stringify(configObj, null, 4),
-      )
+        fs.writeFileSync(
+          configObj.config.dirPath + '/config.json',
+          JSON.stringify(configObj, null, 4),
+        )
+      }
     },
   }
 }
 
-function deepMerge(...sources) {
-  let acc = {}
+function deepMerge(...sources: any) {
+  let acc: any = {}
   for (const source of sources) {
     if (Array.isArray(source)) {
       if (!Array.isArray(acc)) {
@@ -259,7 +283,11 @@ function deepMerge(...sources) {
 
       acc = [...source]
     } else if (source instanceof Object) {
-      for (const [key, value] of Object.entries(source)) {
+      for (let [key, value] of Object.entries(source)) {
+        /* Workaround */
+        const tmpKey = key
+        key = value as any
+        key = tmpKey
         if (value instanceof Object && key in acc) {
           value = deepMerge(acc[key], value)
         }

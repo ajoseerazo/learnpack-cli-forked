@@ -107,13 +107,13 @@ export const exercise = (
       const content = fs.readFileSync(file.path)
 
       // create reset folder
-      if (!fs.existsSync(`${config.dirPath}/resets`))
-        fs.mkdirSync(`${config.dirPath}/resets`)
-      if (!fs.existsSync(`${config.dirPath}/resets/` + this.slug)) {
-        fs.mkdirSync(`${config.dirPath}/resets/` + this.slug)
-        if (!fs.existsSync(`${config.dirPath}/resets/${this.slug}/${name}`)) {
+      if (!fs.existsSync(`${config?.dirPath}/resets`))
+        fs.mkdirSync(`${config?.dirPath}/resets`)
+      if (!fs.existsSync(`${config?.dirPath}/resets/` + this.slug)) {
+        fs.mkdirSync(`${config?.dirPath}/resets/` + this.slug)
+        if (!fs.existsSync(`${config?.dirPath}/resets/${this.slug}/${name}`)) {
           fs.writeFileSync(
-            `${config.dirPath}/resets/${this.slug}/${name}`,
+            `${config?.dirPath}/resets/${this.slug}/${name}`,
             content,
           )
         }
