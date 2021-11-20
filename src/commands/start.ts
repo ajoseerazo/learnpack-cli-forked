@@ -102,10 +102,11 @@ export default class StartCommand extends SessionCommand {
       try {
         this.configManager.reset(exercise.exerciseSlug)
         socket.ready('Ready to compile...')
-      } catch (error: any) {
+      } catch (error) {
         socket.error(
           'compiler-error',
-          error.message || 'There was an error reseting the exercise',
+          (error as TypeError).message ||
+            'There was an error reseting the exercise',
         )
         setTimeout(() => socket.ready('Ready to compile...'), 2000)
       }

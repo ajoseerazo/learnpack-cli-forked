@@ -34,7 +34,7 @@ export const downloadEditor = async (version: any, destination: any) => {
     `https://github.com/learnpack/coding-ide/blob/${version}/dist`,
   )
   if (!resp2.ok)
-    throw new InternalError(
+    throw InternalError(
       `Coding Editor v${version} was not found on learnpack repository, check the config.editor.version property on learn.json`,
     )
 

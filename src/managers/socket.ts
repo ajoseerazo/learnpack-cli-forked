@@ -1,6 +1,8 @@
 import connect from 'socket.io'
 import Console from '../utils/console'
 
+import {IExercise} from '../models/exercise'
+
 export default {
   socket: null,
   config: null,
@@ -11,7 +13,8 @@ export default {
     },
   },
   addAllowed: function (actions: any) {
-    if (!Array.isArray(actions)) actions = [actions]
+    if (!Array.isArray(actions))
+      actions = [actions]
 
     // avoid adding the "test" action if grading is disabled
     if (
@@ -31,7 +34,8 @@ export default {
     ] as any
   },
   removeAllowed: function (actions: any) {
-    if (!Array.isArray(actions)) actions = [actions]
+    if (!Array.isArray(actions))
+      actions = [actions]
     this.allowedActions = (this.allowedActions || []).filter(
       a => !actions.includes(a),
     ) as any
@@ -89,7 +93,7 @@ export default {
       this.on('input', ({inputs}: any) => resolve(inputs))
     })
   },
-  reload: function (files = null, exercises = null) {
+  reload: function (files: Array<string> | null, exercises: Array<IExercise>) {
     this.emit('reload', files, exercises)
   },
 
@@ -145,7 +149,8 @@ export default {
       this.fatal(`Invalid socket success type "${type}" on socket`)
     else if (stdout === '')
       this.log(type + '-success', ['No stdout to display on the console'])
-    else this.log(type + '-success', [stdout])
+    else
+      this.log(type + '-success', [stdout])
   },
   error: function (type: any, stdout: any) {
     console.error('Socket error: ' + type, stdout)

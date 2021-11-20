@@ -25,7 +25,7 @@ class BaseCommand extends Command {
 
       rl.on('SIGINT', function () {
         // process.emit('SIGINT')
-        process.emit('SIGINT')
+        // process.emit('SIGINT')
       })
     }
   }

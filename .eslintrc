@@ -8,7 +8,14 @@
     "unicorn/prefer-node-protocol": "off",
     "nonblock-statement-body-position": ["error", "below"],
     "no-negated-condition": "off",
-    "prefer-promise-reject-errors": "off"
+    "prefer-promise-reject-errors": "off",
+    "no-warning-comments": "off",
+    "no-implicit-coercion": "off",
+    "no-process-exit": "off",
+    "unicorn/no-array-callback-reference": "off",
+    "new-cap": "off",
+    "unicorn/throw-new-error": "off",
+    "unicorn/import-style": "off"
   },
   "extends": [
     "oclif", 

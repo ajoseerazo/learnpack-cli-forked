@@ -10,13 +10,7 @@ export default class SessionCommand extends BaseCommand {
   configManager: any = null
   static flags: any
 
-  constructor(args: any) {
-    super(args)
-    this.configManager = null
-    this.session = null
-  }
-
-  async initSession(flags: any, _private: boolean) {
+  async initSession(flags: any, _private = false) {
     try {
       if (!this.configManager) {
         await this.buildConfig(flags)
@@ -27,13 +21,13 @@ export default class SessionCommand extends BaseCommand {
         Console.debug(`Session open for ${this.session.payload.email}.`)
       } else {
         if (_private)
-          throw new AuthError(
+          throw AuthError(
             'You need to log in, run the following command to continue: $ learnpack login',
           )
         Console.debug('No active session available', _private)
       }
-    } catch (error: any) {
-      Console.error(error.message)
+    } catch (error) {
+      Console.error((error as TypeError).message)
     }
   }
 

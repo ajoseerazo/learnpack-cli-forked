@@ -9,12 +9,12 @@ import {detect, filterFiles} from '../config/exercise'
 const withHandler = (func: any) => (req: any, res: any) => {
   try {
     func(req, res)
-  } catch (error: any) {
+  } catch (error) {
     Console.debug(error)
     const _err = {
-      message: error.message || 'There has been an error',
-      status: error.status || 500,
-      type: error.type || null,
+      message: (error as any).message || 'There has been an error',
+      status: (error as any).status || 500,
+      type: (error as any).type || null,
     }
     Console.error(_err.message)
 

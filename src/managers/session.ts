@@ -19,7 +19,7 @@ const Session: ISession = {
   initialize: async function () {
     if (!this.sessionStarted) {
       if (!this.config) {
-        throw new InternalError('Configuration not found')
+        throw InternalError('Configuration not found')
       }
 
       if (!fs.existsSync(this.config.dirPath)) {
@@ -43,7 +43,7 @@ const Session: ISession = {
     let payload = null
     try {
       payload = await storage.getItem('bc-payload')
-    } catch (error: any) {
+    } catch (error) {
       // TODO: Remove it
       console.log(error)
       Console.debug('Error retriving session payload')
@@ -79,7 +79,7 @@ const Session: ISession = {
   login: async function () {
     const email = await cli.prompt('What is your email?')
     if (!v.isEmail(email)) {
-      throw new ValidationError('Invalid email')
+      throw ValidationError('Invalid email')
     }
 
     const password = await cli.prompt('What is your password?', {

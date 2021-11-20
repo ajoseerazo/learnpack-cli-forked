@@ -3,6 +3,7 @@ import * as storage from 'node-persist'
 import cli from 'cli-ux'
 // const HOST = "https://8000-a72835c1-5411-423b-86e2-dd8df8faab48.ws-us03.gitpod.io";
 const HOST = 'https://learnpack.herokuapp.com'
+import _fetch from 'node-fetch'
 
 interface IHeaders {
   'Content-Type'?: string;
@@ -11,6 +12,8 @@ interface IHeaders {
 
 interface IOptions {
   headers?: IHeaders;
+  method?: string;
+  body?: string;
 }
 
 const fetch = async (url: string, options: IOptions = {}) => {
@@ -31,33 +34,34 @@ const fetch = async (url: string, options: IOptions = {}) => {
     if (resp.status >= 200 && resp.status < 300)
       return await resp.json()
     if (resp.status === 401)
-      throw new APIError('Invalid authentication credentials', 401)
+      throw APIError('Invalid authentication credentials', 401)
     else if (resp.status === 404)
-      throw new APIError('Package not found', 404)
+      throw APIError('Package not found', 404)
     else if (resp.status >= 500)
-      throw new APIError('Impossible to connect with the server', 500)
+      throw APIError('Impossible to connect with the server', 500)
     else if (resp.status >= 400) {
       const error = await resp.json()
       if (error.detail || error.error) {
-        throw new APIError(error.detail || error.error)
+        throw APIError(error.detail || error.error)
       } else if (error.nonFieldErrors) {
-        throw new APIError(nonFieldErrors[0], error)
+        throw APIError(error.nonFieldErrors[0], error)
       } else if (typeof error === 'object') {
         if (Object.keys(error).length > 0) {
-          throw new APIError(`${key}: ${error[key][0]}`, error)
+          const key = error[Object.keys(error)[0]]
+          throw APIError(`${key}: ${error[key][0]}`, error)
         }
       } else {
-        throw new APIError('Uknown error')
+        throw APIError('Uknown error')
       }
     } else
-      throw new APIError('Uknown error')
+      throw APIError('Uknown error')
   } catch (error) {
-    Console.error(error.message)
+    Console.error((error as TypeError).message)
     throw error
   }
 }
 
-const login = async (identification, password) => {
+const login = async (identification: string, password: string) => {
   try {
     cli.action.start('Looking for credentials...')
     await cli.wait(1000)
@@ -68,12 +72,12 @@ const login = async (identification, password) => {
     cli.action.stop('ready')
     return data
   } catch (error) {
-    Console.error(error.message)
+    Console.error((error as TypeError).message)
     Console.debug(error)
   }
 }
 
-const publish = async config => {
+const publish = async (config: any) => {
   const keys = [
     'difficulty',
     'language',
@@ -85,7 +89,7 @@ const publish = async config => {
     'title',
   ]
 
-  const payload = {}
+  const payload: { [key: string]: string } = {}
   for (const k of keys)
     config[k] ? (payload[k] = config[k]) : null
   try {
@@ -100,13 +104,13 @@ const publish = async config => {
     return data
   } catch (error) {
     console.log('payload', payload)
-    Console.error(error.message)
+    Console.error((error as TypeError).message)
     Console.debug(error)
     throw error
   }
 }
 
-const update = async config => {
+const update = async (config: any) => {
   try {
     cli.action.start('Updating package information...')
     await cli.wait(1000)
@@ -117,13 +121,13 @@ const update = async config => {
     cli.action.stop('ready')
     return data
   } catch (error) {
-    Console.error(error.message)
+    Console.error((error as any).message)
     Console.debug(error)
     throw error
   }
 }
 
-const getPackage = async slug => {
+const getPackage = async (slug: string) => {
   try {
     cli.action.start('Downloading package information...')
     await cli.wait(1000)
@@ -131,7 +135,7 @@ const getPackage = async slug => {
     cli.action.stop('ready')
     return data
   } catch (error) {
-    if (error.status === 404)
+    if ((error as any).status === 404)
       Console.error(`Package ${slug} does not exist`)
     else
       Console.error(`Package ${slug} does not exist`)
@@ -148,16 +152,16 @@ const getLangs = async () => {
     cli.action.stop('ready')
     return data
   } catch (error) {
-    if (error.status === 404)
-      Console.error(`Package ${slug} does not exist`)
+    if ((error as any).status === 404)
+      Console.error('Package slug does not exist')
     else
-      Console.error(`Package ${slug} does not exist`)
+      Console.error('Package slug does not exist')
     Console.debug(error)
     throw error
   }
 }
 
-const getAllPackages = async ({lang = '', slug = ''}) => {
+const getAllPackages = async ({lang = '', slug = ''}: any) => {
   try {
     cli.action.start('Downloading packages...')
     await cli.wait(1000)
@@ -173,9 +177,9 @@ const getAllPackages = async ({lang = '', slug = ''}) => {
   }
 }
 
-const APIError = (error, code) => {
-  const message = error.message || error
-  const _err = new Error(message)
+const APIError = (error: TypeError | string, code?: number) => {
+  const message: string = (error as TypeError).message || (error as string)
+  const _err = new Error(message) as any
   _err.status = code || 400
   return _err
 }
