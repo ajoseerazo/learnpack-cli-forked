@@ -18,8 +18,45 @@ import {IExercise} from '../models/exercise'
 } from "../utils/errors.js"; */
 
 export default class StartCommand extends SessionCommand {
-  static description: string
-  static flags: any
+  static description = 'Runs a small server with all the exercise instructions'
+
+  static flags = {
+    ...SessionCommand.flags,
+    port: flags.string({char: 'p', description: 'server port'}),
+    host: flags.string({char: 'h', description: 'server host'}),
+    disableGrading: flags.boolean({
+      char: 'D',
+      description: 'disble grading functionality',
+      default: false,
+    }),
+    // disableGrading: flags.boolean({char: 'dg', description: 'disble grading functionality', default: false }),
+    watch: flags.boolean({
+      char: 'w',
+      description: 'Watch for file changes',
+      default: false,
+    }),
+    editor: flags.string({
+      char: 'e',
+      description: '[standalone, gitpod]',
+      options: ['standalone', 'gitpod'],
+    }),
+    version: flags.string({
+      char: 'v',
+      description: 'E.g: 1.0.1',
+      default: undefined,
+    }),
+    grading: flags.string({
+      char: 'g',
+      description: '[isolated, incremental]',
+      options: ['isolated', 'incremental'],
+    }),
+    debug: flags.boolean({
+      char: 'd',
+      description: 'debugger mode for more verbage',
+      default: false,
+    }),
+  }
+
   // 🛑 IMPORTANT
   // Every command that will use the configManager needs this init method
   async init() {
@@ -148,44 +185,4 @@ export default class StartCommand extends SessionCommand {
         socket.reload(null, _exercises),
       )
   }
-}
-
-StartCommand.description =
-  'Runs a small server with all the exercise instructions'
-
-StartCommand.flags = {
-  ...SessionCommand.flags,
-  port: flags.string({char: 'p', description: 'server port'}),
-  host: flags.string({char: 'h', description: 'server host'}),
-  disableGrading: flags.boolean({
-    char: 'D',
-    description: 'disble grading functionality',
-    default: false,
-  }),
-  // disableGrading: flags.boolean({char: 'dg', description: 'disble grading functionality', default: false }),
-  watch: flags.boolean({
-    char: 'w',
-    description: 'Watch for file changes',
-    default: false,
-  }),
-  editor: flags.string({
-    char: 'e',
-    description: '[standalone, gitpod]',
-    options: ['standalone', 'gitpod'],
-  }),
-  version: flags.string({
-    char: 'v',
-    description: 'E.g: 1.0.1',
-    default: undefined,
-  }),
-  grading: flags.string({
-    char: 'g',
-    description: '[isolated, incremental]',
-    options: ['isolated', 'incremental'],
-  }),
-  debug: flags.boolean({
-    char: 'd',
-    description: 'debugger mode for more verbage',
-    default: false,
-  }),
 }
