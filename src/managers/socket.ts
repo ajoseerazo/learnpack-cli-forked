@@ -36,8 +36,10 @@ const SocketManager: ISocket = {
     ] as any
   },
   removeAllowed: function (actions: any) {
-    if (!Array.isArray(actions))
+    if (!Array.isArray(actions)) {
       actions = [actions]
+    }
+
     this.allowedActions = (this.allowedActions || []).filter(
       a => !actions.includes(a),
     ) as any
@@ -95,7 +97,7 @@ const SocketManager: ISocket = {
       this.on('input', ({inputs}: any) => resolve(inputs))
     })
   },
-  reload: function (files: Array<string> | null, exercises: Array<IExercise>) {
+  reload: function (files: Array<string> | null, exercises: Array<string>) {
     this.emit(
       'reload',
       files?.join('') || '' /* TODO: Check it out this */,
@@ -104,7 +106,7 @@ const SocketManager: ISocket = {
   },
   log: function (
     status: any,
-    messages: any = [],
+    messages: string | Array<string> = [],
     report: any = [],
     data: any = null,
   ) {
@@ -114,7 +116,7 @@ const SocketManager: ISocket = {
   emit: function (
     action: any,
     status: any = 'ready',
-    logs: any = [],
+    logs: string | Array<string> = [],
     inputs: any = [],
     report: any = [],
     data: any = null,
@@ -145,7 +147,7 @@ const SocketManager: ISocket = {
     })
   },
 
-  ready: function (message: any) {
+  ready: function (message: string) {
     this.log('ready', [message])
   },
   success: function (type: any, stdout: string) {

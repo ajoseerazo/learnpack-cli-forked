@@ -182,7 +182,7 @@ export default class StartCommand extends SessionCommand {
 
     // start watching for file changes
     if ((flags as any).watch)
-      this.configManager.watchIndex((_exercises: Array<IExercise>) =>
+      this.configManager.watchIndex((_exercises: Array<string>) =>
         socket.reload(null, _exercises),
       )
   }

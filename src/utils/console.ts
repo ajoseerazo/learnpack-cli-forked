@@ -6,7 +6,8 @@ export default {
   startDebug: function () {
     this._debug = true
   },
-  log: (msg: string, ...args: any) => console.log(chalk.gray(msg), ...args),
+  log: (msg: string | Array<string>, ...args: any) =>
+    console.log(chalk.gray(msg), ...args),
   error: (msg: string, ...args: any) =>
     console.log(chalk.red('⨉ ' + msg), ...args),
   success: (msg: string, ...args: any) =>

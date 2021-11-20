@@ -1,11 +1,12 @@
 import * as fs from 'fs'
-import p from 'path'
+import * as p from 'path'
 import * as shell from 'shelljs'
 import {cli} from 'cli-ux'
 import * as targz from 'targz'
 import Console from '../utils/console'
 import * as https from 'https'
 import * as fetch from 'isomorphic-fetch'
+import {InternalError} from '../utils/errors'
 
 export const decompress = (sourcePath: any, destinationPath: any) =>
   new Promise((resolve, reject) => {

@@ -19,22 +19,22 @@ export interface ISocket {
   on: (action: any, callBack: any) => void;
   clean: (_: string, logs: Array<any>) => void;
   ask: (questions: Array<string>) => void;
-  reload: (files: Array<string> | null, exercises: Array<IExercise>) => void;
+  reload: (files: Array<string> | null, exercises: Array<string>) => void;
   log: (
     status: string,
-    messages: Array<string>,
+    messages: string | Array<string>,
     report?: Array<any>,
     data?: any
   ) => void;
   emit: (
     action: any,
     status: string,
-    logs: Array<any>,
+    logs: string | Array<string>,
     inputs?: Array<any>,
     report?: Array<any>,
     data?: any
   ) => void;
-  ready: (message: Array<any>) => void;
+  ready: (message: string) => void;
   error: (type: any, stdout: string) => void;
   fatal: (msg: string) => void;
   success: (type: any, stdout: string) => void;
