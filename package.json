@@ -100,13 +100,11 @@
     "version": "oclif-dev readme && git add README.md",
     "prepare": "husky install"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run test"
-    }
-  },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
-    "*.{js,css,md,ts}": "prettier --write"
+    "*.{js,css,md,ts}": [
+      "prettier --write",
+      "npm run test"
+    ]
   }
 }
