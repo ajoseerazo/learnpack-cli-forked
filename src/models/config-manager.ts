@@ -13,6 +13,6 @@ export interface IConfigManager {
   getExercise: (slug: string) => IExercise;
   reset: (slug: string) => void;
   buildIndex: () => boolean | void;
-  watchIndex: (onChange: () => void) => void;
+  watchIndex: (onChange: (...args: any) => void) => void;
   save: () => void;
 }

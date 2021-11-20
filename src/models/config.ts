@@ -35,6 +35,7 @@ export interface IConfig {
   disable_grading?: boolean;
   disableGrading?: boolean;
   compiler: TCompiler;
+  exercises?: Array<IExercise>;
   runHook: (...agrs: Array<any>) => void;
 }
 
@@ -44,4 +45,6 @@ export interface IConfigObj {
   config?: IConfig;
   exercises?: Array<IExercise>;
   grading?: TGrading;
+  repository: string;
+  slug: string;
 }

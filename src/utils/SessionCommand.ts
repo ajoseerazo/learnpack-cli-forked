@@ -4,10 +4,11 @@ import Console from './console'
 import SessionManager from '../managers/session'
 import configManager from '../managers/config/index'
 import {AuthError} from './errors'
+import {IConfigManager} from '../models/config-manager'
 
 export default class SessionCommand extends BaseCommand {
   session: any = null
-  configManager: any = null
+  configManager: IConfigManager | null = null
   static flags: any
 
   async initSession(flags: any, _private = false) {

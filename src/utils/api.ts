@@ -161,7 +161,13 @@ const getLangs = async () => {
   }
 }
 
-const getAllPackages = async ({lang = '', slug = ''}: any) => {
+const getAllPackages = async ({
+  lang = '',
+  slug = '',
+}: {
+  lang: string;
+  slug?: string;
+}) => {
   try {
     cli.action.start('Downloading packages...')
     await cli.wait(1000)

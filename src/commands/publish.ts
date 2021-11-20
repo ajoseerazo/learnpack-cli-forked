@@ -45,14 +45,14 @@ class PublishCommand extends SessionCommand {
       `Session found for ${this.session.payload.email}, publishing the package...`,
     )
 
-    const configObject = this.configManager.get()
-    if (configObject.slug === undefined || !configObject.slug) {
+    const configObject = this.configManager?.get()
+    if (configObject?.slug === undefined || !configObject.slug) {
       throw new Error(
         "The package is missing a slug (unique name identifier), please check your learn.json file and make sure it has a 'slug'",
       )
     }
 
-    if (!validURL(configObject.repository)) {
+    if (!validURL(configObject?.repository)) {
       throw new Error(
         "The package has a missing or invalid 'repository' on the configuration file, it needs to be a Github URL",
       )

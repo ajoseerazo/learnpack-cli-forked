@@ -25,7 +25,7 @@ export const getSolution = (slug?: string): ISolution => {
       'https://raw.githubusercontent.com/breatheco-de/breathecode-cli/master/docs/errors/errors.json',
     )
     .then((r: Response) => r.json())
-    .then(function (_s: any) {
+    .then(function (_s: { [key: string]: ISolution }) {
       solutions = _s
     })
     return uknown

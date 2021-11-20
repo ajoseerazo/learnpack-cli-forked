@@ -4,7 +4,7 @@ import * as debounce from 'debounce'
 export default (path: string) =>
   new Promise((resolve /* , reject */) => {
     const watcher = chokidar.watch(path, {
-      ignored: (_path: any, _stats: any) => {
+      ignored: (_path: string, _stats: any) => {
         return _stats && !_stats.isDirectory()
       },
       persistent: true,

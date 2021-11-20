@@ -70,122 +70,134 @@ export default class StartCommand extends SessionCommand {
     const {flags}: { flags: IStartFlags } = this.parse(StartCommand)
 
     // get configuration object
-    const configObject = this.configManager.get()
-    const {config} = configObject
+    const configObject = this.configManager?.get()
 
-    // build exerises
-    this.configManager.buildIndex()
+    if (configObject) {
+      const {config} = configObject
 
-    Console.debug(
-      `Grading: ${config.grading} ${
-        config.disable_grading ? '(disabled)' : ''
-      }, editor: ${config.editor.mode} ${config.editor.version}, for ${
-        Array.isArray(config.exercises) ? config.exercises.length : 0
-      } exercises found`,
-    )
+      // build exerises
+      this.configManager?.buildIndex()
 
-    // download app and decompress
-    await downloadEditor(config.editor.version, `${config.dirPath}/app.tar.gz`)
-
-    Console.info('Decompressing LearnPack UI, this may take a minute...')
-    await decompress(`${config.dirPath}/app.tar.gz`, `${config.dirPath}/_app/`)
-
-    const server = await createServer(configObject, this.configManager)
-
-    // listen to socket commands
-    socket.start(config, server)
-
-    socket.on('gitpod-open', (data: IGitpodData) => {
-      Console.debug('Opening these files on gitpod: ', data)
-      Gitpod.openFiles(data.files)
-    })
-
-    socket.on('reset', (exercise: IExercise) => {
-      try {
-        this.configManager.reset(exercise.exerciseSlug)
-        socket.ready('Ready to compile...')
-      } catch (error) {
-        socket.error(
-          'compiler-error',
-          (error as TypeError).message ||
-            'There was an error reseting the exercise',
-        )
-        setTimeout(() => socket.ready('Ready to compile...'), 2000)
-      }
-    })
-    // socket.on("preview", (data) => {
-    //   Console.debug("Preview triggered, removing the 'preview' action ")
-    //   socket.removeAllowed("preview")
-    //   socket.log('ready',['Ready to compile...'])
-    // })
-
-    socket.on('build', async (data: IExercise) => {
-      const exercise = this.configManager.getExercise(data.exerciseSlug)
-
-      if (!exercise.language) {
-        socket.error(
-          'compiler-error',
-          'Impossible to detect language to build for ' +
-            data.exerciseSlug +
-            '...',
-        )
-        return
-      }
-
-      socket.log(
-        'compiling',
-        'Building exercise ' +
-          data.exerciseSlug +
-          ' with ' +
-          exercise.language +
-          '...',
-      )
-      await this.config.runHook('action', {
-        action: 'compile',
-        socket,
-        configuration: config,
-        exercise,
-      })
-    })
-
-    socket.on('test', async (data: IExercise) => {
-      const exercise = this.configManager.getExercise(data.exerciseSlug)
-
-      if (!exercise.language) {
-        socket.error(
-          'compiler-error',
-          'Impossible to detect engine language for testing for ' +
-            data.exerciseSlug +
-            '...',
-        )
-        return
-      }
-
-      if (config.disableGrading) {
-        socket.ready('Grading is disabled on configuration')
-        return true
-      }
-
-      socket.log(
-        'testing',
-        'Testing your exercise using the ' + exercise.language + ' engine.',
+      Console.debug(
+        `Grading: ${config?.grading} ${
+          config?.disable_grading ? '(disabled)' : ''
+        }, editor: ${config?.editor.mode} ${config?.editor.version}, for ${
+          Array.isArray(config?.exercises) ? config?.exercises.length : 0
+        } exercises found`,
       )
 
-      await this.config.runHook('action', {
-        action: 'test',
-        socket,
-        configuration: config,
-        exercise,
-      })
-      this.configManager.save()
-
-      return true
-    })
-
-    // start watching for file changes
-    if (flags.watch)
-      this.configManager.watchIndex((_exercises: Array<string>) =>
-        socket.reload(null, _exercises),
+      // download app and decompress
+      await downloadEditor(
+        config?.editor.version,
+        `${config?.dirPath}/app.tar.gz`,
       )
+
+      Console.info('Decompressing LearnPack UI, this may take a minute...')
+      await decompress(
+        `${config?.dirPath}/app.tar.gz`,
+        `${config?.dirPath}/_app/`,
+      )
+
+      // listen to socket commands
+      if (config && this.configManager) {
+        const server = await createServer(configObject, this.configManager)
+
+        socket.start(config, server)
+
+        socket.on('gitpod-open', (data: IGitpodData) => {
+          Console.debug('Opening these files on gitpod: ', data)
+          Gitpod.openFiles(data.files)
+        })
+
+        socket.on('reset', (exercise: IExercise) => {
+          try {
+            this.configManager?.reset(exercise.exerciseSlug)
+            socket.ready('Ready to compile...')
+          } catch (error) {
+            socket.error(
+              'compiler-error',
+              (error as TypeError).message ||
+                'There was an error reseting the exercise',
+            )
+            setTimeout(() => socket.ready('Ready to compile...'), 2000)
+          }
+        })
+        // socket.on("preview", (data) => {
+        //   Console.debug("Preview triggered, removing the 'preview' action ")
+        //   socket.removeAllowed("preview")
+        //   socket.log('ready',['Ready to compile...'])
+        // })
+
+        socket.on('build', async (data: IExercise) => {
+          const exercise = this.configManager?.getExercise(data.exerciseSlug)
+
+          if (!exercise?.language) {
+            socket.error(
+              'compiler-error',
+              'Impossible to detect language to build for ' +
+                data.exerciseSlug +
+                '...',
+            )
+            return
+          }
+
+          socket.log(
+            'compiling',
+            'Building exercise ' +
+              data.exerciseSlug +
+              ' with ' +
+              exercise.language +
+              '...',
+          )
+          await this.config.runHook('action', {
+            action: 'compile',
+            socket,
+            configuration: config,
+            exercise,
+          })
+        })
+
+        socket.on('test', async (data: IExercise) => {
+          const exercise = this.configManager?.getExercise(data.exerciseSlug)
+
+          if (!exercise?.language) {
+            socket.error(
+              'compiler-error',
+              'Impossible to detect engine language for testing for ' +
+                data.exerciseSlug +
+                '...',
+            )
+            return
+          }
+
+          if (config.disableGrading) {
+            socket.ready('Grading is disabled on configuration')
+            return true
+          }
+
+          socket.log(
+            'testing',
+            'Testing your exercise using the ' + exercise.language + ' engine.',
+          )
+
+          await this.config.runHook('action', {
+            action: 'test',
+            socket,
+            configuration: config,
+            exercise,
+          })
+          this.configManager?.save()
+
+          return true
+        })
+
+        // start watching for file changes
+        if (flags.watch) {
+          this.configManager?.watchIndex((_exercises: Array<string>) =>
+            socket.reload(null, _exercises),
+          )
+        }
+      }
+    }
   }
 }

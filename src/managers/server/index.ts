@@ -4,8 +4,12 @@ import addRoutes from './routes'
 import cli from 'cli-ux'
 import * as http from 'http'
 import {IConfigObj} from '../../models/config'
+import {IConfigManager} from '../../models/config-manager'
 
-export default async function (configObj: IConfigObj, configManager: any) {
+export default async function (
+  configObj: IConfigObj,
+  configManager: IConfigManager,
+) {
   const {config} = configObj
   const app = express()
   const server = http.createServer(app)

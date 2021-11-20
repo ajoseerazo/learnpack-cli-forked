@@ -1,3 +1,4 @@
+import {Server} from 'socket.io'
 import {IConfig} from './config'
 
 export type TFile = string;
@@ -7,7 +8,7 @@ export interface IGitpodData {
 }
 
 export interface IGitpod {
-  socket: any | null;
+  socket: Server | null;
   config: IConfig | null;
   initialized: boolean;
   hasGPCommand: boolean;

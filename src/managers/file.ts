@@ -28,7 +28,10 @@ export const decompress = (sourcePath: string, destinationPath: string) =>
     )
   })
 
-export const downloadEditor = async (version: string, destination: string) => {
+export const downloadEditor = async (
+  version: string | undefined,
+  destination: string,
+) => {
   // https://raw.githubusercontent.com/learnpack/coding-ide/master/dist/app.tar.gz
   // if(versions[version] === undefined) throw new Error(`Invalid editor version ${version}`)
   const resp2 = await fetch(
