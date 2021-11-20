@@ -10,6 +10,7 @@ import createServer from '../managers/server'
 
 import {IGitpodData} from '../models/gitpod-data'
 import {IExercise} from '../models/exercise'
+import {IStartFlags} from '../models/flags'
 
 /* import {
   ValidationError,
@@ -65,7 +66,8 @@ export default class StartCommand extends SessionCommand {
   }
 
   async run() {
-    // const {flags} = this.parse(StartCommand)
+    // TODO: Review this
+    const {flags}: { flags: IStartFlags } = this.parse(StartCommand)
 
     // get configuration object
     const configObject = this.configManager.get()
@@ -181,7 +183,7 @@ export default class StartCommand extends SessionCommand {
     })
 
     // start watching for file changes
-    if ((flags as any).watch)
+    if (flags.watch)
       this.configManager.watchIndex((_exercises: Array<string>) =>
         socket.reload(null, _exercises),
       )
