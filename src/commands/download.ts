@@ -33,9 +33,9 @@ Extra documentation goes here
   async run() {
     const {/* flags, */ args} = this.parse(DownloadCommand)
     // start watching for file changes
-    let _package = args.package
+    let _package: string = args.package
     if (!_package) {
-      _package = await askPackage()
+      _package = (await askPackage()) as string
     }
 
     if (!_package) {

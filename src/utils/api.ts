@@ -165,7 +165,7 @@ const getAllPackages = async ({
   lang = '',
   slug = '',
 }: {
-  lang: string;
+  lang?: string;
   slug?: string;
 }) => {
   try {

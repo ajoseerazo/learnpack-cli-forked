@@ -20,7 +20,7 @@ class CleanCommand extends SessionCommand {
   async run() {
     /* const { flags } = */ this.parse(CleanCommand)
 
-    this.configManager.clean()
+    this.configManager?.clean()
 
     Console.success('Package cleaned successfully, ready to publish')
   }
