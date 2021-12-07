@@ -80,13 +80,20 @@ class InitComand extends BaseCommand {
 
     cli.action.start('Initializing package')
 
+    const languages = ['en', 'es']
     
     try{
       const templatesDir = path.resolve(__dirname,"../utils/templates/"+choices.grading || "no-grading")
       if(!fs.existsSync(templatesDir)) throw ValidationError(`Template ${templatesDir} does not exists`)
       await fs.copySync(templatesDir, './')
-      fs.writeFileSync('./README.md', eta.render(fs.readFileSync(path.resolve(__dirname,`${templatesDir}/README.ejs`),'utf-8'), packageInfo))
-      if(fs.existsSync('./README.ejs') && !fs.existsSync('./README.md')) fs.removeSync('./README.ejs')
+      
+      // Creating README files
+      languages.forEach((language) => {
+        const readmeFilename = `README${language !== 'en' ? `.${language}` : ''}`
+        fs.writeFileSync(`./${readmeFilename}.md`, eta.render(fs.readFileSync(path.resolve(__dirname,`${templatesDir}/${readmeFilename}.ejs`),'utf-8'), packageInfo))
+        if(fs.existsSync(`./${readmeFilename}.ejs`) && !fs.existsSync(`./${readmeFilename}.md`)) fs.removeSync(`./${readmeFilename}.ejs`)
+      })
+
       if(!fs.existsSync('./.gitignore')) fs.copyFile(path.resolve(__dirname,'../utils/templates/gitignore.txt'), './.gitignore')
       fs.writeFileSync('./learn.json', JSON.stringify(packageInfo, null, 2))
     }
