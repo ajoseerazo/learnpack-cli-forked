@@ -5,6 +5,7 @@ const Console = require('../utils/console')
 const socket = require('../managers/socket.js')
 const queue = require("../utils/fileQueue")
 const { download, decompress, downloadEditor } = require('../managers/file.js')
+const { prioritizeHTMLFile } = require('../utils/misc')
 
 const createServer = require('../managers/server')
 
@@ -45,13 +46,16 @@ class StartCommand extends SessionCommand {
 
     // listen to socket commands
     socket.start(config, server)
-
+    
     socket.on("open", (data) => {
       Console.debug("Opening these files: ", data)
-      dispatcher.enqueue(dispatcher.events.OPEN_FILES, data.files)
+      
+      let files = prioritizeHTMLFile(data.files);
+      
+      dispatcher.enqueue(dispatcher.events.OPEN_FILES, files);
       socket.ready('Ready to compile...')
     })
-    
+
     socket.on("open_window", (data) => {
       Console.debug("Opening window: ", data)
       dispatcher.enqueue(dispatcher.events.OPEN_WINDOW, data)
