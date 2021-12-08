@@ -12,7 +12,7 @@ const exercise = (path, position, configObject) => {
     
     if(!validateExerciseDirectoryName(slug)){
         Console.error('Exercise directory "'+slug+'" has an invalid name, it has to start with two or three digits followed by words separated by underscors or hyphen (no white spaces). e.g: 01.12-hello-world')
-        Console.help('Verify that the folder "'+slug+'" starts with a number and it does not contain white spaces or weird characters.')
+        Console.help('Verify that the folder "'+slug+'" starts with two numbers and it does not contain white spaces or weird characters.')
         throw ValidationError(`This exercise has a invalid name: ${slug}`)
     }
     
@@ -95,7 +95,7 @@ const exercise = (path, position, configObject) => {
 
 const validateExerciseDirectoryName = (str) => {
     if(str == "./") return true;
-    const regex = /^(\d{2,3}(\.\d{1,2})?-([A-Za-z0-9]{2,}(-|_)?)+)$/
+    const regex = /^(\d{2,3}(\.\d{1,2})?-([A-Za-z0-9]+(-|_)?)+)$/
     return regex.test(str)
 }
 
