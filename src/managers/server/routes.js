@@ -117,17 +117,17 @@ module.exports = async function(app, configObject, configManager){
         exercise.entry = detected.entry;
         Console.debug(`Exercise detected entry: ${detected.entry} and language ${exercise.language}`)
 
-        if(!exercise.graded || config.disableGrading) socket.removeAllowed("test")
+        if(!exercise.graded || config.disableGrading || config.disabledActions.includes("test")) socket.removeAllowed("test")
         else socket.addAllowed('test')
 
-        if(!exercise.entry){
+        if(!exercise.entry || config.disabledActions.includes("build")){
             socket.removeAllowed("build")
             Console.debug(`No entry was found for this exercise ${req.params.slug}, looking for the following entries from the config: `, config.entries)
         }
         else socket.addAllowed('build')
 
         if(exercise.files.filter(f => !f.name.toLowerCase().includes("readme.") && !f.name.toLowerCase().includes("test.")).length === 0) socket.removeAllowed("reset")
-        else socket.addAllowed('reset')
+        else if(!config.disabledActions.includes("reset")) socket.addAllowed('reset')
 
         socket.log('ready')
 

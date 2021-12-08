@@ -17,7 +17,8 @@ module.exports = {
         exercisesPath: './', // path to the folder that contains the exercises
         webpackTemplate: null, // if you want webpack to use an HTML template
         disableGrading: false,
-        actions: ['build', 'test', 'reset'], //this should be empty by default, but I'm testing
+        disabledActions: [], //Possible: 'build', 'test' or 'reset'
+        actions: [], // ⚠️ deprecated, leave empty )
         entries: {
             html: "index.html",
             vanillajs: "index.js",

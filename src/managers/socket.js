@@ -130,6 +130,9 @@ module.exports = {
       this.removeAllowed("reset");
     }
 
+    Console.debug("dactions", this.config)
+    this.config.disabledActions.forEach(a => this.removeAllowed(a))
+
     this.socket.emit("compiler", {
       action,
       status,

@@ -76,7 +76,7 @@ module.exports = async ({ grading, mode, disableGrading, version }) => {
     if (!jsonConfig.session)
       jsonConfig.session = Math.floor(Math.random() * 10000000000000000000);
 
-    configObj = deepMerge(hiddenBcContent, jsonConfig, {
+    configObj = deepMerge(hiddenBcContent, { config: jsonConfig }, {
       config: { disableGrading },
     });
     Console.debug("Content form the configuration .json ", configObj);
