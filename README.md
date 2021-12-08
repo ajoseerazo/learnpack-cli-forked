@@ -19,7 +19,7 @@ $ npm install -g learnpack
 $ learnpack COMMAND
 running command...
 $ learnpack (-v|--version|version)
-learnpack/0.1.20 darwin-x64 node-v10.17.0
+learnpack/0.1.21 darwin-x64 node-v10.17.0
 $ learnpack --help [COMMAND]
 USAGE
   $ learnpack COMMAND
@@ -43,6 +43,7 @@ USAGE
 * [`learnpack plugins:update`](#learnpack-pluginsupdate)
 * [`learnpack publish [PACKAGE]`](#learnpack-publish-package)
 * [`learnpack start`](#learnpack-start)
+* [`learnpack test [EXERCISESLUG]`](#learnpack-test-exerciseslug)
 
 ## `learnpack audit`
 
@@ -57,7 +58,7 @@ DESCRIPTION
   Extra documentation goes here
 ```
 
-_See code: [src/commands/audit.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.20/src/commands/audit.js)_
+_See code: [src/commands/audit.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.21/src/commands/audit.js)_
 
 ## `learnpack clean`
 
@@ -72,7 +73,7 @@ DESCRIPTION
   Extra documentation goes here
 ```
 
-_See code: [src/commands/clean.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.20/src/commands/clean.js)_
+_See code: [src/commands/clean.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.21/src/commands/clean.js)_
 
 ## `learnpack download [PACKAGE]`
 
@@ -90,7 +91,7 @@ DESCRIPTION
   Extra documentation goes here
 ```
 
-_See code: [src/commands/download.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.20/src/commands/download.js)_
+_See code: [src/commands/download.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.21/src/commands/download.js)_
 
 ## `learnpack hello`
 
@@ -108,7 +109,7 @@ DESCRIPTION
   Extra documentation goes here
 ```
 
-_See code: [src/commands/hello.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.20/src/commands/hello.js)_
+_See code: [src/commands/hello.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.21/src/commands/hello.js)_
 
 ## `learnpack help [COMMAND]`
 
@@ -139,7 +140,7 @@ OPTIONS
   -h, --grading  show CLI help
 ```
 
-_See code: [src/commands/init.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.20/src/commands/init.js)_
+_See code: [src/commands/init.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.21/src/commands/init.js)_
 
 ## `learnpack login [PACKAGE]`
 
@@ -157,7 +158,7 @@ DESCRIPTION
   Extra documentation goes here
 ```
 
-_See code: [src/commands/login.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.20/src/commands/login.js)_
+_See code: [src/commands/login.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.21/src/commands/login.js)_
 
 ## `learnpack logout [PACKAGE]`
 
@@ -175,7 +176,7 @@ DESCRIPTION
   Extra documentation goes here
 ```
 
-_See code: [src/commands/logout.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.20/src/commands/logout.js)_
+_See code: [src/commands/logout.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.21/src/commands/logout.js)_
 
 ## `learnpack plugins`
 
@@ -310,7 +311,7 @@ DESCRIPTION
   Extra documentation goes here
 ```
 
-_See code: [src/commands/publish.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.20/src/commands/publish.js)_
+_See code: [src/commands/publish.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.21/src/commands/publish.js)_
 
 ## `learnpack start`
 
@@ -336,5 +337,19 @@ OPTIONS
   -w, --watch                         Watch for file changes
 ```
 
-_See code: [src/commands/start.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.20/src/commands/start.js)_
+_See code: [src/commands/start.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.21/src/commands/start.js)_
+
+## `learnpack test [EXERCISESLUG]`
+
+Test exercises
+
+```
+USAGE
+  $ learnpack test [EXERCISESLUG]
+
+ARGUMENTS
+  EXERCISESLUG  The name of the exercise to test
+```
+
+_See code: [src/commands/test.js](https://github.com/learnpack/learnpack-cli/blob/v0.1.21/src/commands/test.js)_
 <!-- commandsstop -->
