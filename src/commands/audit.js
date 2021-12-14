@@ -144,16 +144,16 @@ class AuditCommand extends SessionCommand {
         Console.info(' Checking if the config file is fine...')
         // These two lines check if the 'slug' property is inside the configuration object.
         Console.debug("Checking if the slug property is inside the configuration object...")
-        if (!config.slug) errors.push({ exercise: null, msg: "The slug property is not in the configuration object" })
+        if (!config.config.slug) errors.push({ exercise: null, msg: "The slug property is not in the configuration object" })
 
         // These two lines check if the 'repository' property is inside the configuration object.
         Console.debug("Checking if the repository property is inside the configuration object...")
-        if (!config.repository) errors.push({ exercise: null, msg: "The repository property is not in the configuration object" })
-        else isUrl(config.repository, errors, counter)
+        if (!config.config.repository) errors.push({ exercise: null, msg: "The repository property is not in the configuration object" })
+        else isUrl(config.config.repository, errors, counter)
 
         // These two lines check if the 'description' property is inside the configuration object.
         Console.debug("Checking if the description property is inside the configuration object...")
-        if (!config.description) errors.push({ exercise: null, msg: "The description property is not in the configuration object" })
+        if (!config.config.description) errors.push({ exercise: null, msg: "The description property is not in the configuration object" })
 
         if (errors.length == 0) Console.log("The config file is ok")
 
