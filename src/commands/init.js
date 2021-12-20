@@ -91,7 +91,7 @@ class InitComand extends BaseCommand {
       languages.forEach((language) => {
         const readmeFilename = `README${language !== 'en' ? `.${language}` : ''}`
         fs.writeFileSync(`./${readmeFilename}.md`, eta.render(fs.readFileSync(path.resolve(__dirname,`${templatesDir}/${readmeFilename}.ejs`),'utf-8'), packageInfo))
-        if(fs.existsSync(`./${readmeFilename}.ejs`) && !fs.existsSync(`./${readmeFilename}.md`)) fs.removeSync(`./${readmeFilename}.ejs`)
+        if(fs.existsSync(`./${readmeFilename}.ejs`)) fs.removeSync(`./${readmeFilename}.ejs`)
       })
 
       if(!fs.existsSync('./.gitignore')) fs.copyFile(path.resolve(__dirname,'../utils/templates/gitignore.txt'), './.gitignore')
