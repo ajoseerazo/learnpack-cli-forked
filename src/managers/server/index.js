@@ -31,7 +31,7 @@ module.exports = async function (
       );
       Console.success(`\n            Open the exercise on this link:`);
       Console.log(`            ${config.publicUrl}`);
-      if (config.editor.mode === "standalone") cli.open(`${config.publicUrl}`);
+      // if (config.editor.mode === "standalone") cli.open(`${config.publicUrl}`);
     }
   });
 
